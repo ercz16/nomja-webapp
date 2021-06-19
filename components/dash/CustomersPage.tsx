@@ -44,7 +44,7 @@ const Customers = (props) => {
 const CustomerLine = (props) => {
     return (
         <>
-            <div key={props.data.id} className="grid grid-cols-7 p-3 text-lg cursor-pointer hover:bg-gray-100">
+            <div key={props.data.id} className="grid grid-cols-7 p-3 text-lg cursor-pointer hover:bg-gray-100 hover:shadow">
                 <p className="">{ props.data.name }</p>
                 <p>{ props.data.phoneNum }</p>
                 <p>{ props.data.textMessages }</p>
