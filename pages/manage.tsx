@@ -1,9 +1,9 @@
 import Link from 'next/link'
 
-import { getSSRProps } from '../utils/auth/ServerAuth'
+import { getSSRPropsUser } from '../utils/auth/ServerAuth'
 
 export const getServerSideProps = async (ctx) => {
-    const props = await getSSRProps(ctx)
+    const props = await getSSRPropsUser(ctx)
     return props
 }
 

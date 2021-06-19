@@ -1,6 +1,7 @@
 import nookies from "nookies"
 
 import { firebaseAdmin } from '../firebase/FirebaseAdmin'
+import { fetchSSRInfo } from '../program/Program'
 
 const getSSRAuth = async (ctx) => {
     try {
@@ -23,7 +24,7 @@ const getSSRAuth = async (ctx) => {
     }
 }
 
-const getSSRProps = async (ctx) => {
+const getSSRPropsUser = async (ctx) => {
     try {
         const user = await getSSRAuth(ctx)
         return {
@@ -42,4 +43,26 @@ const getSSRProps = async (ctx) => {
     }
 }
 
-export { getSSRAuth, getSSRProps }
+const getSSRPropsProgram = async (ctx) => {
+    const { id } = ctx.query
+    try {
+        const user = await getSSRAuth(ctx)
+        const program = await fetchSSRInfo(id[0])
+        return {
+            props: {
+                user: user,
+                program: program
+            }
+        }
+    } catch (e) {
+        return {
+            redirect: {
+                permanent: false,
+                destination: '/auth/signin'
+            }, 
+            props: {} as never
+        }
+    }
+}
+
+export { getSSRAuth, getSSRPropsUser, getSSRPropsProgram }

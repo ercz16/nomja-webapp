@@ -2,17 +2,30 @@ import RewardsPage from '../../../components/dash/RewardsPage'
 import CustomersPage from '../../../components/dash/CustomersPage'
 
 import { useEffect, useState } from 'react'
+import { getSSRPropsProgram } from '../../../utils/auth/ServerAuth'
 
-var Page = {
-    DASHBOARD: <RewardsPage />,
-    REWARDS: <RewardsPage />,
-    CUSTOMERS: <CustomersPage />,
-    SETINGS: <CustomersPage />,
-    SUPPORT: <CustomersPage />
+const getPages = (props) => {
+    const { program, user } = props
+    return {
+        DASHBOARD: <RewardsPage />,
+        REWARDS: <RewardsPage user={user} program={program} />,
+        CUSTOMERS: <CustomersPage user={user} program={program} />,
+        SETINGS: <CustomersPage />,
+        SUPPORT: <CustomersPage />
+    }
+}
+
+export const getServerSideProps = async (ctx) => {
+    const props = await getSSRPropsProgram(ctx)
+    return props
 }
 
 const Index = (props) => {
-    const [currentPage, setCurrentPage] = useState(Page.REWARDS)
+    const { program, user } = props
+
+    const Pages = getPages(props)
+
+    const [currentPage, setCurrentPage] = useState(Pages.REWARDS)
 
     return (
         <>
@@ -22,7 +35,7 @@ const Index = (props) => {
                     <p className="text-2xl font-bold text-white">Nomja</p>
                 </div>
                 <div className="flex flex-row items-center col-start-8 gap-x-2">
-                    <p className="text-lg text-white">Ryan McCauley</p>
+                    <p className="text-lg text-white">{ user.name.first + ' ' + user.name.last }</p>
                     <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-white fill-current" viewBox="0 0 20 20" fill="currentColor">
                         <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
                     </svg>
@@ -32,9 +45,9 @@ const Index = (props) => {
                 <div className="h-screen col-span-1 bg-white shadow">
                     <div className="grid grid-rows-1 p-8 gap-y-6">
                         <div className="flex flex-col p-2 bg-gray-100 rounded shadow">
-                            <p className="text-xl font-semibold text-gray-800">Crab Shack</p>
-                            <p className="text-lg text-gray-500">A restaurant from the ocean!</p> 
-                            <p className="text-lg text-gray-500">Since July 7th, 2012</p> 
+                            <p className="text-xl font-semibold text-gray-800">{ program.name }</p>
+                            <p className="text-lg text-gray-500">{ program.description }</p> 
+                            <p className="text-lg text-gray-500">Since { new Date(program.creationDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) }</p> 
                         </div>
                         <div className="flex flex-row items-center gap-4 p-2 text-gray-600 rounded cursor-pointer hover:text-gray-800 hover:bg-gray-100 hover:shadow-sm">
                             <svg xmlns="http://www.w3.org/2000/svg" className="fill-current w-7 h-7" viewBox="0 0 20 20" fill="currentColor">
@@ -42,13 +55,13 @@ const Index = (props) => {
                             </svg>
                             <p className="text-xl">Dashboard</p>
                         </div>
-                        <div onClick={() => setCurrentPage(Page.REWARDS)} className={currentPage == Page.REWARDS ? "flex flex-row items-center gap-4 p-2 text-gray-600 rounded cursor-pointer text-gray-800 bg-gray-100 shadow-sm" : "flex flex-row items-center gap-4 p-2 text-gray-600 rounded cursor-pointer hover:text-gray-800 hover:bg-gray-100 hover:shadow-sm"}>
+                        <div onClick={() => setCurrentPage(Pages.REWARDS)} className={currentPage == Pages.REWARDS ? "flex flex-row items-center gap-4 p-2 text-gray-600 rounded cursor-pointer text-gray-800 bg-gray-100 shadow-sm" : "flex flex-row items-center gap-4 p-2 text-gray-600 rounded cursor-pointer hover:text-gray-800 hover:bg-gray-100 hover:shadow-sm"}>
                             <svg xmlns="http://www.w3.org/2000/svg" className="fill-current w-7 h-7" viewBox="0 0 20 20" fill="currentColor">
                                 <path fillRule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                             </svg>
                             <p className="text-xl">Rewards</p>
                         </div>
-                        <div onClick={() => setCurrentPage(Page.CUSTOMERS)}  className={currentPage == Page.CUSTOMERS ? "flex flex-row items-center gap-4 p-2 text-gray-600 rounded cursor-pointer text-gray-800 bg-gray-100 shadow-sm" : "flex flex-row items-center gap-4 p-2 text-gray-600 rounded cursor-pointer hover:text-gray-800 hover:bg-gray-100 hover:shadow-sm"}>
+                        <div onClick={() => setCurrentPage(Pages.CUSTOMERS)}  className={currentPage == Pages.CUSTOMERS ? "flex flex-row items-center gap-4 p-2 text-gray-600 rounded cursor-pointer text-gray-800 bg-gray-100 shadow-sm" : "flex flex-row items-center gap-4 p-2 text-gray-600 rounded cursor-pointer hover:text-gray-800 hover:bg-gray-100 hover:shadow-sm"}>
                             <svg xmlns="http://www.w3.org/2000/svg" className="fill-current w-7 h-7" viewBox="0 0 20 20" fill="currentColor">
                                 <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
                             </svg>
