@@ -100,6 +100,13 @@ const Rewards = (props) => {
     )
 }
 
+const DeleteModal = (props) => {
+    return (
+        <>
+        </>
+    )
+}
+
 const CreateModal = (props) => {
     const { program, isOpen, openCreate, closeCreate } = props
     const [loading, setLoading] = useState(false)
@@ -115,8 +122,6 @@ const CreateModal = (props) => {
             const reward = await createReward(program.id, { name: name.value, description: description.value != undefined ? description.value : "", attributes: {
                 type: type, required: required.value != undefined ? required.value : "", activeUntil: activeUntil.value != undefined ? activeUntil.value : new Date(new Date().setFullYear(new Date().getFullYear() + 100))
                 , discount: discountPercentage != undefined ? discountPercentage.value : "" }})
-            setLoading(false)
-            closeCreate()
             router.reload()
         } catch (e) {
             console.error(e)
