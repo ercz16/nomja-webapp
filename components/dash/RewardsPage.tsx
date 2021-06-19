@@ -1,5 +1,7 @@
 import { useState, Fragment, useRef } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
+import { createReward } from '../../utils/program/rewards/Reward'
+import { useRouter } from 'next/router'
 
 enum RewardType {
     VISIT = "VISIT",
@@ -9,6 +11,10 @@ enum RewardType {
 
 const getRequiredText = (type, required) => {
     if (type == RewardType.VISIT) {
+        return <p className="text-lg text-gray-500">After { required } visit</p>
+    } else if (type == RewardType.POINTS) {
+        return <p className="text-lg text-gray-500">After { required } points</p>
+    } else {
         return <p className="text-lg text-gray-500">After { required } visit</p>
     }
 }
@@ -49,7 +55,7 @@ const Rewards = (props) => {
                             </button>
                         </div>
                     </div>
-                    <CreateModal isOpen={isOpen} openCreate={openCreate} closeCreate={closeCreate} />
+                    <CreateModal program={program} isOpen={isOpen} openCreate={openCreate} closeCreate={closeCreate} />
                     <div className="pt-3">
                         <div className="grid grid-cols-7 gap-4">
                             { program.rewards.map((reward) => {
@@ -95,15 +101,28 @@ const Rewards = (props) => {
 }
 
 const CreateModal = (props) => {
-    const { isOpen, openCreate, closeCreate } = props
+    const { program, isOpen, openCreate, closeCreate } = props
     const [loading, setLoading] = useState(false)
     const [type, setType] = useState(RewardType.VISIT)
     const hiddenSubmit = useRef(null)
+    const router = useRouter()
     
     const handleCreation = async (e) => {
         e.preventDefault()
-
         const { name, description, required, activeUntil, discountPercentage } = e.target
+
+        try {
+            const reward = await createReward(program.id, { name: name.value, description: description.value != undefined ? description.value : "", attributes: {
+                type: type, required: required.value != undefined ? required.value : "", activeUntil: activeUntil.value != undefined ? activeUntil.value : new Date(new Date().setFullYear(new Date().getFullYear() + 100))
+                , discount: discountPercentage != undefined ? discountPercentage.value : "" }})
+            setLoading(false)
+            closeCreate()
+            router.reload()
+        } catch (e) {
+            console.error(e)
+            setLoading(false)
+            closeCreate()
+        }
     }
 
     const submitButton = async (e) => {
@@ -118,7 +137,7 @@ const CreateModal = (props) => {
             <Dialog
               as="div"
               className="fixed inset-0 z-10 my-24 overflow-y-auto"
-              onClose={closeCreate}
+              onClose={loading ? () => {} : closeCreate}
             >
               <div className="min-h-screen px-4 text-center">
                 <Transition.Child
@@ -190,14 +209,14 @@ const CreateModal = (props) => {
                     </div>
                     <div className="mt-5">
                         <div className="flex flex-row justify-end gap-4">
-                            <button onClick={closeCreate} className={ !loading ? "px-4 py-2 font-medium text-gray-500 border border-gray-500 rounded cursor-pointer hover:bg-gray-500 hover:text-white text-md focus:outline-none" : "px-4 py-2 font-medium text-gray-500 border border-gray-500 rounded cursor-pointer hover:bg-gray-500 hover:text-white text-md focus:outline-none"}>Cancel</button>
+                            <button onClick={closeCreate} className={ !loading ? "px-4 py-2 font-medium text-gray-500 border border-gray-500 rounded cursor-pointer hover:bg-gray-500 hover:text-white text-md focus:outline-none" : "px-4 py-2 font-medium text-gray-400 border border-gray-400 rounded cursor-pointer text-md focus:outline-none cursor-not-allowed"}>Cancel</button>
                             <button onClick={(e) => submitButton(e)} className={ !loading ? "flex flex-row items-center gap-1 px-4 py-2 font-medium text-white bg-red-500 rounded cursor-pointer hover:bg-red-600 text-md focus:outline-none" : "flex flex-row items-center gap-1 px-4 py-2 font-medium text-white bg-red-400 rounded cursor-not-allowed text-md focus:outline-none"} >
                                 { loading ? 
                                 (
                                     <>
                                     Create
                                     <svg className="w-5 h-5 ml-2 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                     </svg>
                                     </>
