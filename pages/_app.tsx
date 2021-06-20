@@ -1,8 +1,22 @@
 import 'tailwindcss/tailwind.css'
 
+import ProgressBar from "@badrap/bar-of-progress"
+import Router from "next/router"
+
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { AuthProvider } from '../utils/auth/AuthProvider'
+
+const progress = new ProgressBar({
+  size: 2,
+  color: "#EF4444",
+  className: "z-50",
+  delay: 100,
+})
+
+Router.events.on("routeChangeStart", progress.start)
+Router.events.on("routeChangeComplete", progress.finish)
+Router.events.on("routeChangeError", progress.finish)
 
 function MyApp({ Component, pageProps }) {
   /*const router = useRouter()
