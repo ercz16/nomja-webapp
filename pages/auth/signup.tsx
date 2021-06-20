@@ -63,7 +63,7 @@ const getPasswordIndicator = (pass) => {
 const SignUp = (props) => {
     const router = useRouter()
     const [loading, setLoading] = useState(false)
-
+    const [error, setError] = useState(null)
     const [password, setPassword] = useState('')
 
     const handleSubmit = async (e) => {
@@ -74,10 +74,12 @@ const SignUp = (props) => {
         const { email, password, first, last, phone, birthday } = e.target
 
         try {
+            var passStrength = checkPassStrength(password.value)
+            if (passStrength == PasswordStrength.MODERATE || passStrength == PasswordStrength.WEAK) throw new Error('Your password is not strong enough.')
             const user = await signUp({ first: first.value, last: last.value, email: email.value, password: password.value, phone: phone.value != undefined ? phone.value : "", birthday: birthday != undefined ? birthday.value : "" })
             router.push('/manage')
         } catch (e) {
-            console.log(e)
+            setError(e.message)
             setLoading(false)
         }
     }
@@ -97,6 +99,13 @@ const SignUp = (props) => {
                         </p>
                     </div>
                     <div className="flex flex-col gap-4 p-8 bg-white rounded shadow-sm">
+                        { !error ? "" :
+                        (
+                            <div className="flex flex-col p-3 bg-red-100 border-l-4 border-red-600">
+                                <p className="text-lg font-medium text-red-600">Error</p>
+                                <p className="text-red-600 text-md">{ error }</p>
+                            </div>
+                        )}
                         <form onSubmit={handleSubmit} className="flex flex-col gap-y-4">
                             <div className="grid grid-cols-2 gap-2">
                                 <div className="flex flex-col gap-1">
@@ -128,7 +137,7 @@ const SignUp = (props) => {
                             <div className="flex flex-col">
                                 <label className="flex items-center text-gray-600">
                                     <input type="checkbox" name="rememberMe" className="rounded form-checkbox focus:outline-none" />
-                                    <span className="ml-2">I agree to the <Link href="/legal/privacy"><a className="font-medium text-red-500">privacy policy</a></Link></span>
+                                    <span className="ml-2">I agree to the <Link href="/legal/privacy"><a className="font-medium text-blue-500">privacy policy</a></Link></span>
                                 </label>
                             </div>
                             <div className="flex flex-col mt-2">
