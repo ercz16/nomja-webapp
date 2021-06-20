@@ -1,26 +1,61 @@
 import Link from 'next/link'
 
-import { signIn } from '../../utils/auth/ClientAuth'
+import { signUp } from '../../utils/auth/ClientAuth'
 import { getSSRAuth } from '../../utils/auth/ServerAuth'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+import { kStringMaxLength } from 'buffer'
 
 enum PasswordStrength {
-    POOR = "POOR",
-    MODERATE = "MODERATOR",
-    STRONG = "STRONG"
+    WEAK = "Weak",
+    MODERATE = "Moderate",
+    STRONG = "Strong"
 }
 
-const getPasswordStrength = (pass) => {
-    return <p className="font-medium text-red-500">Poor Password</p>
+const checkPassStrength = (pass) => {
+    var score = scorePassword(pass)
+    if (score > 80) return PasswordStrength.STRONG
+    else if (score > 60) return PasswordStrength.MODERATE
+    else return PasswordStrength.WEAK
 }
 
+const scorePassword = (pass) => {
+    var score = 0
+    if (!pass) return score
+
+    var letters = new Object()
+    for (var i = 0; i < pass.length; i++) {
+        letters[pass[i]] = (letters[pass[i]] || 0) + 1
+        score += 5.0 / letters[pass[i]]
+    }
+    
+    var variations = {
+        digits: /\d/.test(pass),
+        lower: /[a-z]/.test(pass),
+        upper: /[A-Z]/.test(pass),
+        nonWords: /\W/.test(pass),
+    }
+
+    var variationCount = 0
+    for (var check in variations) {
+        variationCount += (variations[check] == true) ? 1 : 0
+    }
+    score += (variationCount - 1) * 10
+
+    return score
+}
 const getPasswordIndicator = (pass) => {
+    const strength = checkPassStrength(pass)
     return (
         <>
-            <div className="border-t-4 border-red-500" />
-            <div className="border-t-4 border-gray-200" />
-            <div className="border-t-4 border-gray-200" />
+        <div className="grid grid-cols-3 gap-2 mt-2">
+            <div className={strength == PasswordStrength.WEAK ? "border-t-4 border-red-500" : strength == PasswordStrength.MODERATE ? "border-t-4 border-yellow-500" : "border-t-4 border-green-500"} />
+            <div className={strength == PasswordStrength.WEAK ? "border-t-4 border-gray-200" : strength == PasswordStrength.MODERATE ? "border-t-4 border-yellow-500" : "border-t-4 border-green-500"} />
+            <div className={strength == PasswordStrength.WEAK ? "border-t-4 border-gray-200" : strength == PasswordStrength.MODERATE ? "border-t-4 border-gray-200" : "border-t-4 border-green-500"} />
+        </div>
+        <div className="grid grid-cols-2">
+            <p className={strength == PasswordStrength.WEAK ? "font-medium text-red-500" : strength == PasswordStrength.MODERATE ? "font-medium text-yellow-500" : "font-medium text-green-500"}>{strength} Password</p>
+        </div>
         </>
     )
 }
@@ -36,10 +71,10 @@ const SignUp = (props) => {
 
         setLoading(true)
 
-        const { email, password } = e.target
+        const { email, password, first, last, phone, birthday } = e.target
 
         try {
-            
+            const user = await signUp({ first: first.value, last: last.value, email: email.value, password: password.value, phone: phone.value != undefined ? phone.value : "", birthday: birthday != undefined ? birthday.value : "" })
             router.push('/manage')
         } catch (e) {
             console.log(e)
@@ -88,12 +123,7 @@ const SignUp = (props) => {
                             <div className="flex flex-col gap-1">
                                 <p className="font-medium text-gray-600">Password</p>
                                 <input onChange={(e) => setPassword(e.target.value)} type="password" name="password" className="border border-gray-300 rounded shadow-sm" placeholder="Password" />
-                                <div className="grid grid-cols-3 gap-2 mt-2">
-                                    { getPasswordIndicator(password) }
-                                </div>
-                                <div className="grid grid-cols-2">
-                                    { getPasswordStrength(password) }
-                                </div>
+                                { getPasswordIndicator(password) }
                             </div>
                             <div className="flex flex-col">
                                 <label className="flex items-center text-gray-600">
