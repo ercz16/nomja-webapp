@@ -18,7 +18,7 @@ interface IRewardOptions {
     }
 }
 
-const createReward = async (programId, rewardOptions: IRewardOptions) => {
+const createReward = async (userId, programId, rewardOptions: IRewardOptions) => {
     const db = await firestore().collection('programs')
     const update = await db.doc(programId).update({ rewards: firestore.FieldValue.arrayUnion(rewardOptions) })
 }

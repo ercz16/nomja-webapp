@@ -55,7 +55,7 @@ const Rewards = (props) => {
                             </button>
                         </div>
                     </div>
-                    <CreateModal program={program} isOpen={isOpen} openCreate={openCreate} closeCreate={closeCreate} />
+                    <CreateModal user={user} program={program} isOpen={isOpen} openCreate={openCreate} closeCreate={closeCreate} />
                     <div className="pt-3">
                         <div className="grid grid-cols-7 gap-4">
                             { program.rewards.map((reward) => {
@@ -108,7 +108,7 @@ const DeleteModal = (props) => {
 }
 
 const CreateModal = (props) => {
-    const { program, isOpen, openCreate, closeCreate } = props
+    const { user, program, isOpen, openCreate, closeCreate } = props
     const [loading, setLoading] = useState(false)
     const [type, setType] = useState(RewardType.VISIT)
     const hiddenSubmit = useRef(null)
@@ -119,7 +119,7 @@ const CreateModal = (props) => {
         const { name, description, required, activeUntil, discountPercentage } = e.target
 
         try {
-            const reward = await createReward(program.id, { name: name.value, description: description.value != undefined ? description.value : "", attributes: {
+            const reward = await createReward(user.login.uid, program.id, { name: name.value, description: description.value != undefined ? description.value : "", attributes: {
                 type: type, required: required.value != undefined ? required.value : "", activeUntil: activeUntil.value != undefined ? activeUntil.value : new Date(new Date().setFullYear(new Date().getFullYear() + 100))
                 , discount: discountPercentage != undefined ? discountPercentage.value : "" }})
             router.reload()
