@@ -2,16 +2,108 @@ import Link from 'next/link'
 
 import { useRouter } from 'next/router'
 import { getSSRPropsUser } from '../utils/auth/ServerAuth'
-import { Menu } from '@headlessui/react'
-import { useState } from 'react'
+import { Dialog, Transition } from '@headlessui/react'
+import { Fragment, useState, useRef } from 'react'
 
 export const getServerSideProps = async (ctx) => {
     const props = await getSSRPropsUser(ctx)
     return props
 }
 
+const CreateModal = (props) => {
+    const { isOpen, close, open } = props
+
+    const submit = useRef(null)
+
+    const handleSubmit = async (e) => {
+        e.preventDefault()
+
+        const { name } = e.target
+
+        console.log(name.value)
+    }
+
+    return (
+        <>    
+          <Transition appear show={isOpen} as={Fragment}>
+            <Dialog
+              as="div"
+              className="fixed inset-0 z-10 overflow-y-auto"
+              onClose={close}
+            >
+            <Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
+              <div className="min-h-screen px-4 text-center">
+                <Transition.Child
+                  as={Fragment}
+                  enter="ease-out duration-300"
+                  enterFrom="opacity-0"
+                  enterTo="opacity-100"
+                  leave="ease-in duration-200"
+                  leaveFrom="opacity-100"
+                  leaveTo="opacity-0"
+                >
+                  <Dialog.Overlay className="fixed inset-0" />
+                </Transition.Child>
+    
+                {/* This element is to trick the browser into centering the modal contents. */}
+                <span
+                  className="inline-block h-screen align-middle"
+                  aria-hidden="true"
+                >
+                  &#8203;
+                </span>
+                <Transition.Child
+                  as={Fragment}
+                  enter="ease-out duration-300"
+                  enterFrom="opacity-0 scale-95"
+                  enterTo="opacity-100 scale-100"
+                  leave="ease-in duration-200"
+                  leaveFrom="opacity-100 scale-100"
+                  leaveTo="opacity-0 scale-95"
+                >
+                  <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white rounded-md shadow">
+                    <Dialog.Title
+                      as="h3"
+                      className="text-xl font-medium"
+                    >
+                      Create a program
+                    </Dialog.Title>
+                    <p className="text-gray-500 text-md">Fill out the form below to create a new program.</p>
+
+                    <div className="flex flex-col gap-4">
+                        <form onSubmit={handleSubmit} className="grid grid-cols-4 gap-2 py-4">
+                            <div className="flex flex-col col-span-2 gap-0">
+                                <p className="font-lg text-md">Name</p>
+                                <input name="name" className="px-2 py-1 border border-gray-300 rounded shadow-sm font-lg" placeholder="Ex. Joe's Crabshack" />
+                            </div>
+                            <button ref={submit} className="hidden" type="submit" />
+                        </form>
+                        <div className="flex flex-row items-center justify-end gap-4 text-lg">
+                            <button onClick={() => close()} className="px-3 py-1 text-gray-800 bg-gray-200 rounded shadow-sm hover:text-gray-900 hover:bg-gray-300">Cancel</button>
+                            <button onClick={() => submit.current.click()} className="px-3 py-1 text-white bg-red-500 rounded shadow-sm hover:bg-red-600">Create</button>
+                        </div>
+                    </div>
+                  </div>
+                </Transition.Child>
+              </div>
+            </Dialog>
+          </Transition>
+        </>
+      )
+}
+
 const Manage = (props) => {
     const { user } = props
+    const [createOpen, setCreateOpen] = useState(true)
+
+    const openCreate = () => {
+        setCreateOpen(true)
+    }
+
+    const closeCreate = () => {
+        setCreateOpen(false)
+    }
+    
     return (
         <>
         <div className="min-h-screen bg-gray-100">
@@ -23,13 +115,14 @@ const Manage = (props) => {
             <div className="container flex flex-col gap-2 px-8 mx-auto divide-y-2">
                 <div className="flex flex-row items-center p-2">
                     <p className="text-2xl font-medium">Manage Programs</p>
-                    <button className="flex flex-row items-center gap-1 px-3 py-1 ml-auto text-xl font-medium text-white bg-red-500 rounded shadow-sm hover:bg-red-600 focus:outline-none">
+                    <button onClick={() => setCreateOpen(!createOpen)} className="flex flex-row items-center gap-1 px-3 py-1 ml-auto text-xl font-medium text-white bg-red-500 rounded shadow-sm hover:bg-red-600 focus:outline-none">
                         Create New
                         <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 20 20" fill="currentColor">
                             <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
                         </svg>
                     </button>
                 </div>
+                <CreateModal isOpen={createOpen} open={() => setCreateOpen(true)} close={() => setCreateOpen(false)} />
                 <div className="grid grid-cols-5 gap-4 py-8">
                     { user.programs.map((program) => {
                         return <ProgramCard program={program} />
