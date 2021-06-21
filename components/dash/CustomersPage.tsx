@@ -12,7 +12,6 @@ const exampleCustomer = {
 }
 
 const Customers = (props) => {
-
     return (
         <>
             <div className="px-16 py-8">

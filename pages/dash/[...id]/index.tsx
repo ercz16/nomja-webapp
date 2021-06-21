@@ -1,8 +1,11 @@
 import RewardsPage from '../../../components/dash/RewardsPage'
 import CustomersPage from '../../../components/dash/CustomersPage'
+import Link from 'next/link'
 
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { getSSRPropsProgram } from '../../../utils/auth/ServerAuth'
+import { auth } from '../../../utils/firebase/Firebase'
 
 const getPages = (props) => {
     const { program, user } = props
@@ -21,24 +24,41 @@ export const getServerSideProps = async (ctx) => {
 }
 
 const Index = (props) => {
+    const router = useRouter()
     const { program, user } = props
-
     const Pages = getPages(props)
-
     const [currentPage, setCurrentPage] = useState(Pages.REWARDS)
+    const [accountDropdownOpen, setAccountDropdownOpen] = useState(false)
 
     return (
         <>
         <div className="h-screen bg-gray-100">
-            <div className="grid grid-cols-8 px-8 py-4 bg-gray-900">
-                <div className="col-span-1">
-                    <p className="text-2xl font-bold text-white">Nomja</p>
+            <div className="grid items-center grid-cols-8 px-8 py-4 bg-gray-900">
+                <div className="col-span-1 p-1">
+                    <Link href="/manage">
+                        <a>
+                            <img src="/all-together.png" className="h-9" />
+                        </a>
+                    </Link>
                 </div>
-                <div className="flex flex-row items-center col-start-8 gap-x-2">
-                    <p className="text-lg text-white">{ user.name.first + ' ' + user.name.last }</p>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-white fill-current" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                    </svg>
+                <div className="flex flex-col col-start-8">
+                    <div onClick={() => setAccountDropdownOpen(true)} className="flex flex-row items-center cursor-pointer gap-x-2">
+                        <p className="text-lg font-medium text-white">{ user.name.first + ' ' + user.name.last }</p>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-white fill-current" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                        </svg>
+                    </div>
+                    <div className={!accountDropdownOpen ? "hidden" : "absolute flex flex-col w-32 px-3 py-2 mt-8 bg-white rounded shadow"}>
+                        <p onClick={async () => {
+                            const logout = await auth().signOut()
+                            const redirect = router.push('/auth/signin')
+                        }}className="flex flex-row items-center p-1 rounded cursor-pointer hover:bg-gray-100">
+                            <span className="font-medium">Logout</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                            </svg>
+                        </p>
+                    </div>
                 </div>
             </div>
             <div className="grid grid-cols-7">
