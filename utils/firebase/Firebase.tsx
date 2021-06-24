@@ -1,4 +1,5 @@
 import firebase from 'firebase/app'
+import 'firebase/firestore'
 import 'firebase/functions'
 import 'firebase/auth'
 
@@ -12,14 +13,23 @@ const firebaseConfig = {
     appId: "1:975683339648:web:1f4fd8ca85338904f72d65"
 }
 
-export const app = firebase.initializeApp(firebaseConfig)
+export var app
 
-if (typeof window !== "undefined") {
-    firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-    firebase.firestore().settings({
-        ignoreUndefinedProperties: true,
-    });      
-    (window as any).firebase = firebase;
+try {
+    app = firebase.initializeApp(firebaseConfig)
+    if (typeof window !== "undefined") {
+        firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+        firebase.firestore().settings({
+            ignoreUndefinedProperties: true,
+        });      
+        (window as any).firebase = firebase;
+    }
+} catch (e) {
+    if (!/already exists/u.test(e.message)) {
+        //console.error('Firebase Error', e.stack)
+    } else {
+        app = firebase.apps[0]
+    }
 }
 
 export default firebase
