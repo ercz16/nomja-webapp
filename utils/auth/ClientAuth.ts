@@ -1,5 +1,7 @@
-import { useDebugValue } from 'react'
-import { auth, firestore } from '../firebase/Firebase'
+import { nanoid } from 'nanoid'
+import { fb } from '../firebase/Firebase'
+
+const firestore = fb().firestore, auth = fb().auth
 
 interface ISignUpOptions {
     first: string,
@@ -29,7 +31,11 @@ const signUp = async (options: ISignUpOptions) => {
             programs: [],
             registered: {
                 at: new Date().toString()
-            }
+            },
+            apiKeys: [
+                nanoid(64)
+            ],
+            metadata: []
         })
         return doc
     } else {

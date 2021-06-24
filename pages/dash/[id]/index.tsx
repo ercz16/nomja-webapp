@@ -2,11 +2,14 @@ import RewardsPage from '../../../components/dash/RewardsPage'
 import CustomersPage from '../../../components/dash/CustomersPage'
 import Link from 'next/link'
 import Head from 'next/head'
+import QRCode from 'qrcode'
 
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { getSSRPropsProgram } from '../../../utils/auth/ServerAuth'
-import { auth } from '../../../utils/firebase/Firebase'
+import { fb } from '../../../utils/firebase/Firebase'
+
+const firestore = fb().firestore, auth = fb().auth
 
 const getPages = (props) => {
     const { program, user } = props
@@ -24,12 +27,31 @@ export const getServerSideProps = async (ctx) => {
     return props
 }
 
+const formatPhoneNumber = (phoneNumberString) => { 
+    var cleaned = ('' + phoneNumberString).replace(/\D/g, '');
+    var match = cleaned.match(/^(1|)?(\d{3})(\d{3})(\d{4})$/);
+    if (match) {
+      var intlCode = (match[1] ? '+1 ' : '');
+      return [intlCode, '(', match[2], ') ', match[3], '-', match[4]].join('');
+    }
+    return null;
+}
+
 const Index = (props) => {
     const router = useRouter()
     const { program, user } = props
     const Pages = getPages(props)
     const [currentPage, setCurrentPage] = useState(Pages.REWARDS)
     const [accountDropdownOpen, setAccountDropdownOpen] = useState(false)
+    const [url, setUrl] = useState(null)
+
+    console.log(program)
+
+    useEffect(() => {
+        QRCode.toDataURL(`SMSTO:${program.phoneNum}:@${program.uniqueCode}`, (err, url) => {
+            setUrl(url)
+        })
+    }, [])
 
     return (
         <>
@@ -71,7 +93,8 @@ const Index = (props) => {
                         <div className="flex flex-col p-2 bg-gray-100 rounded shadow">
                             <p className="text-xl font-semibold text-gray-800">{ program.name }</p>
                             <p className="text-lg text-gray-500">{ program.description }</p> 
-                            <p className="text-lg text-gray-500">Since { new Date(program.creationDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) }</p> 
+                            <p className="text-gray-500 text-md">@{ program.uniqueCode }</p>
+                            <p className="text-gray-500 text-md">{ formatPhoneNumber(program.phoneNum) }</p>
                         </div>
                         <div className="flex flex-row items-center gap-4 p-2 text-gray-600 rounded cursor-pointer hover:text-gray-800 hover:bg-gray-100 hover:shadow-sm">
                             <svg xmlns="http://www.w3.org/2000/svg" className="fill-current w-7 h-7" viewBox="0 0 20 20" fill="currentColor">
