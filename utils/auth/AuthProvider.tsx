@@ -1,6 +1,8 @@
 import { useState, useEffect, useContext, createContext } from 'react'
 import nookies from 'nookies'
-import { firebase } from '../firebase/Firebase'
+import { fb } from '../firebase/Firebase'
+
+const firestore = fb().firestore, auth = fb().auth
 
 const AuthContext = createContext({ user: null })
 
@@ -11,7 +13,7 @@ export function AuthProvider({ children }) {
         if (typeof window != "undefined") {
             (window as any).nookies = nookies
         }
-        return firebase.auth().onIdTokenChanged(async (user) => {
+        return auth().onIdTokenChanged(async (user) => {
             if (!user) {
                 setUser(null)
                 nookies.destroy(null, "token");
@@ -27,7 +29,7 @@ export function AuthProvider({ children }) {
 
     useEffect(() => {
         const handle = setInterval(async () => {
-            const user = firebase.auth().currentUser
+            const user = auth().currentUser
             if (user) await user.getIdToken(true)
         }, 10 * 60 * 1000)
     }, [])

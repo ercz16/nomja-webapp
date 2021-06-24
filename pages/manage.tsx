@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import { getSSRPropsUser } from '../utils/auth/ServerAuth'
 import { Dialog, Transition } from '@headlessui/react'
 import { Fragment, useState, useRef } from 'react'
-import { createClientProgram } from '../utils/program/ProgramClientSide'
+import { createClientProgram, deleteProgram } from '../utils/program/ProgramClientSide'
 
 export const getServerSideProps = async (ctx) => {
     const props = await getSSRPropsUser(ctx)
@@ -14,21 +14,24 @@ export const getServerSideProps = async (ctx) => {
 
 const CreateModal = (props) => {
     const { user, isOpen, close, open } = props
-
     const router = useRouter()
-
     const submit = useRef(null)
+
+    const [loading, setLoading] = useState(false)
 
     const handleSubmit = async (e) => {
         e.preventDefault()
 
+        setLoading(true)
+
         const { name, description, uniqueCode } = e.target
 
         try {
-            const program = await createClientProgram(user.login.uid, { name: name.value, description:  description.value, uniqueCode: uniqueCode.value }) 
+            const program = await createClientProgram(user, { name: name.value, description:  description.value, uniqueCode: uniqueCode.value }) 
             router.push('/dash/' + program.id)
         } catch (e) {
             console.log(e)
+            setLoading(false)
         }
     }
 
@@ -96,8 +99,19 @@ const CreateModal = (props) => {
                             <button ref={submit} className="hidden" type="submit" />
                         </form>
                         <div className="flex flex-row items-center justify-end gap-4 text-lg">
-                            <button onClick={() => close()} className="px-3 py-1 text-gray-800 bg-gray-200 rounded shadow-sm hover:text-gray-900 hover:bg-gray-300">Cancel</button>
-                            <button onClick={() => submit.current.click()} className="px-3 py-1 text-white bg-red-500 rounded shadow-sm hover:bg-red-600">Create</button>
+                            <button disabled={loading} onClick={() => close()} className={!loading ? "px-3 py-1 text-gray-800 bg-gray-200 rounded shadow-sm hover:text-gray-900 hover:bg-gray-300" : "px-3 py-1 text-gray-800 cursor-not-allowed bg-gray-100 rounded shadow-sm"}>Cancel</button>
+                            <button disabled={loading} onClick={() => submit.current.click()} className={!loading ? "px-3 py-1 text-white bg-red-500 rounded shadow-sm hover:bg-red-600" : "px-3 py-1 text-white bg-red-400 rounded shadow-sm cursor-not-allowed flex flex-row items-center"}>
+                                { !loading ? "Create" :
+                                (
+                                    <>
+                                    Create
+                                    <svg className="w-5 h-5 ml-2 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    </>
+                                )}
+                            </button>
                         </div>
                     </div>
                   </div>
@@ -145,7 +159,7 @@ const Manage = (props) => {
                 <CreateModal user={user} isOpen={createOpen} open={() => setCreateOpen(true)} close={() => setCreateOpen(false)} />
                 <div className="grid grid-cols-5 gap-4 py-8">
                     { user.programs.map((program) => {
-                        return <ProgramCard program={program} />
+                        return <ProgramCard key={program.id} program={program} />
                     })}
                 </div>
             </div>
@@ -171,12 +185,12 @@ const ProgramCard = (props) => {
                 <div className="relative grid items-center grid-cols-3">
                     <p className="col-span-2 text-xl font-medium">{program.name}</p>
                     <div className={!optionsOpen ? "hidden" : "bg-white absolute right-0 col-span-1 p-2 border border-gray-300 text-sm text-gray-800 hover:text-gray-900 rounded mt-11"}>
-                        <p className="flex flex-row items-center gap-1 p-1 font-medium rounded cursor-pointer hover:bg-gray-100">
+                        <a onClick={() => deleteProgram(program.id)} className="flex flex-row items-center gap-1 p-1 font-medium rounded cursor-pointer hover:bg-gray-100">
                             Delete
                             <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 ml-auto" viewBox="0 0 20 20" fill="currentColor">
                                 <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
                             </svg>
-                        </p>
+                        </a>
                         <p onClick={() => setOptionsOpen(false)} className="flex flex-row items-center gap-1 p-1 font-medium rounded cursor-pointer hover:bg-gray-100">
                             Close
                             <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 ml-auto" viewBox="0 0 20 20" fill="currentColor">

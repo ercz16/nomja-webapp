@@ -4,7 +4,7 @@ import 'firebase/firestore'
 import 'firebase/analytics'
 import 'firebase/functions'
 
-export function initialize() {
+const fb = () => {
     const firebaseConfig = {
         apiKey: "AIzaSyBMvfArMOyNyXJSgvpO_t6TWKPTS5JtXxE",
         authDomain: "nomja-c0d40.firebaseapp.com",
@@ -14,7 +14,7 @@ export function initialize() {
         messagingSenderId: "975683339648",
         appId: "1:975683339648:web:1f4fd8ca85338904f72d65"
     }
-    
+
     if (typeof window !== "undefined" && !firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
         firebase
@@ -25,13 +25,7 @@ export function initialize() {
         });      
         (window as any).firebase = firebase;
     }
+    return firebase
 }
 
-initialize()
-
-const auth = firebase.auth
-const firestore = firebase.firestore
-const analytics = firebase.analytics
-const functions = firebase.functions
-
-export { firebase, auth, firestore, analytics, functions }
+export { fb }

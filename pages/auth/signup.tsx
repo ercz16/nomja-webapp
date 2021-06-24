@@ -5,7 +5,6 @@ import { signUp } from '../../utils/auth/ClientAuth'
 import { getSSRAuth } from '../../utils/auth/ServerAuth'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { kStringMaxLength } from 'buffer'
 
 enum PasswordStrength {
     WEAK = "Weak",

@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
-import { firestore } from '../../firebase/Firebase'
+import { fb } from '../../firebase/Firebase'
+const firestore = fb().firestore, auth = fb().auth
 
 enum RewardType {
     VISIT = "VISIT",
