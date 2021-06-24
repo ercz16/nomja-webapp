@@ -6,7 +6,7 @@ import { getSSRAuth } from '../../utils/auth/ServerAuth'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
-const SignIn = (props) => {
+const SignIn = () => {
     const router = useRouter()
     const [loading, setLoading] = useState(false)
 

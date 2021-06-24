@@ -9,8 +9,6 @@ interface IProgramOptions {
     uniqueCode: string
 }
 
-console.log(firebase.app)
-
 var assignPhoneNumber = functions().httpsCallable('assignPhoneNumber')
 var deleteProgramFunc = functions().httpsCallable('deleteProgram')
 

@@ -61,7 +61,7 @@ const getPasswordIndicator = (pass) => {
     )
 }
 
-const SignUp = (props) => {
+const SignUp = () => {
     const router = useRouter()
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)

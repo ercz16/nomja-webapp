@@ -1,16 +1,12 @@
 import Link from 'next/link'
 
-import { useRouter } from 'next/router'
-
-const Error = (props) => {
-    const router = useRouter()
-    
+const Error = () => {
     return (
         <>
         <div className="fixed top-2/4 left-2/4" style={{ transform: 'translate(-50%, -50%)'}}>
             <div className="flex flex-col text-center">
                 <p className="text-3xl font-semibold">404 Error</p>
-                <p className="text-2xl text-gray-900">It appears the page at <b>{ router.asPath }</b> does not exist</p>
+                <p className="text-2xl text-gray-900">It appears this page does not exist</p>
                 <Link href="/auth/signin">
                     <a className="flex flex-row items-center justify-center mt-3 text-lg font-medium text-red-600 hover:text-red-700 hover:underline">
                         Return to safety
