@@ -1,4 +1,7 @@
 import { firebaseAdmin } from '../../utils/firebase/FirebaseAdmin'
+import { search } from '../../utils/vision/Vision'
+import { nanoid } from 'nanoid'
+import axios from 'axios'
 
 const sendMessage = async (from, to, text) => {
     const db = await firebaseAdmin.firestore().collection('messages')
@@ -51,6 +54,20 @@ const getCustomer = async (from: string) => {
     return snapshot.data()
 }
 
+const getSpendLink = async (customer, program) => {
+    const db = firebaseAdmin.firestore().collection('spendLinks')
+    const schema = {
+        id: nanoid(8),
+        redirect: {
+            customer: customer.phoneNum,
+            program: program.id
+        },
+        expire: new Date(new Date().setHours(new Date().getHours() + 1)).toString(),
+    }
+    const create = await db.doc(schema.id).set(schema)
+    return `https://nomja.io/u/${schema.id}`
+}
+
 const executeCommand = async (text: string, to: string, from: string) => {
     const command = getCommand(text)
     const customer = await getCustomer(from)
@@ -70,17 +87,41 @@ const executeCommand = async (text: string, to: string, from: string) => {
             }
         case 'rewards':
             const snapshot = await firebaseAdmin.firestore().collection('customers').doc(from).get()
-            if (!snapshot.exists) {
-                const creation = await firebaseAdmin.firestore().collection('customers').doc(from).set({ rewards: new Array(), phoneNumber: from, programs: new Array() })
-                return 'You have a total of 0 points'
+            const data = snapshot.data()
+            var totalPoints = 0, totalVisits = 0
+            data.rewards.forEach(reward => {
+                if (reward.phoneNum == to) {
+                    switch (reward.type) {
+                        case "POINTS":
+                            totalPoints += reward.amount
+                            break
+                        case "VISIT":
+                            totalVisits++
+                            break
+                    }
+                }
+            })
+            const programSnapshot = await firebaseAdmin.firestore().collection('programs').where('phoneNum', '==', to).get()
+            let availableRewards = new Array()
+            if (programSnapshot.docs.length != 0) {
+                const programData = programSnapshot.docs[0].data()
+                for (const reward of programData.rewards) {
+                    switch (reward.attributes.type) {
+                        case "POINTS":
+                            if (reward.attributes.required <= totalPoints) {
+                                availableRewards.push({ reward: reward, program: programData.id })
+                            }
+                            break
+                        case "VISIT":
+                        if (reward.attributes.required <= totalVisits) {
+                            availableRewards.push({ reward: reward, program: programData.id })
+                        }
+                        break 
+                    }
+                }  
             }
-            const data = await snapshot.data()
-            const rewards = data.reward.filter(reward => reward.phoneNum == to && reward.type == "POINTS")
-            var totalPoints = 0
-            for (const reward of rewards) {
-                totalPoints += reward.amount
-            }
-            return 'You have a total of ' + totalPoints
+            const spendLink = await getSpendLink(data, programSnapshot.docs[0].data())
+            return `You have a total of ${totalPoints} points and ${totalVisits} visits at ${programSnapshot.docs[0].data().name}. Spend them at ${spendLink}`
         case 'commands':
             return 'Text REWARDS to see available rewards. LEAVE to stop receiving messages.'
     }
@@ -119,7 +160,7 @@ const handleReceive = async (text: string, to: string, from: string, type: TextT
     const db = firebaseAdmin.firestore().collection('customers')
     const doc = await db.doc(from).get()
     if (!doc.exists) {
-        const addition = await db.doc(from).set({ programs: new Array(), phoneNum: from, messageHistory: new Array(), lastMessage: {}})
+        const addition = await db.doc(from).set({ id: nanoid(32), programs: new Array(), rewards: [], phoneNum: from, messageHistory: new Array(), lastMessage: {}})
     }
     const lastMessageUpdate = await db.doc(from).update({ lastMessage: { text: text, type: type }})
     const messageHistoryUpdate = await db.doc(from).update({ messageHistory: firebaseAdmin.firestore.FieldValue.arrayUnion({ 
@@ -151,8 +192,30 @@ const handler = async (req, res) => {
         const sent = await sendMessage(To, From, toSend)
         return res.status(200).json(sent)
     } else {
-        const sent = await sendMessage(To, From, "media")
-        return res.status(200).json(sent)
+        const url = req.body.Media0
+        const fetch = await axios.get(url)
+        const redirect = fetch.request.res.responseUrl
+
+        const base64 = await axios.get(redirect, {
+            responseType: "arraybuffer",
+        })
+
+        const base64response = await Buffer.from(
+            base64.data,
+            "binary"
+        )
+        
+        try {
+            const amount = await search(base64response)
+            const customerPoints = await firebaseAdmin.firestore().collection('customers').doc(From).update({ rewards: firebaseAdmin.firestore.FieldValue.arrayUnion({ type: 'POINTS', amount: Math.floor(amount), phoneNum: To, date: new Date().toString() })})
+            const customerVisit = await firebaseAdmin.firestore().collection('customers').doc(From).update({ rewards: firebaseAdmin.firestore.FieldValue.arrayUnion({ type: 'VISIT', amount: 1, phoneNum: To, date: new Date().toString() })})
+            const sent = await sendMessage(To, From, `Successfully redeemed your receipt for ${Math.floor(amount)} points and 1 visit!`)
+            return res.status(200).json(sent)
+        } catch (e) {
+            console.log(e)
+            const sent = await sendMessage(To, From, 'Something went wrong. Please make sure you have your receipt in the image.')
+            return res.status(200).json(sent)
+        }
     }
 }
 

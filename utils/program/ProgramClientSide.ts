@@ -1,4 +1,5 @@
 import { nanoid } from 'nanoid'
+import QRCode from 'qrcode'
 import firebase from '../firebase/Firebase'
 const firestore = firebase.firestore, auth = firebase.auth, functions = firebase.functions
 
@@ -17,6 +18,8 @@ const createClientProgram = async (user, options: IProgramOptions) => {
     const programId = nanoid(16)
     const phoneNum = await assignPhoneNumber({ user: user, programId: programId })
 
+    const qrcode = await QRCode.toDataURL(`SMSTO:${phoneNum.data.phoneNum.phoneNum}:@${options.uniqueCode.toLowerCase()}`, { scale: 25 })
+
     const schema = {
         creation: new Date().toString(),
         description: !options.description ? "" : options.description,
@@ -25,7 +28,8 @@ const createClientProgram = async (user, options: IProgramOptions) => {
         rewards: new Array(),
         users: new Array(),
         uniqueCode: options.uniqueCode.toLowerCase(),
-        phoneNum: phoneNum.data.phoneNum.phoneNum
+        phoneNum: phoneNum.data.phoneNum.phoneNum,
+        qrcode: qrcode
     }
 
     console.log(schema)
@@ -36,11 +40,10 @@ const createClientProgram = async (user, options: IProgramOptions) => {
 }
 
 const deleteProgram = async (uid, programId) => {
-    console.log('Deleting...')
     const db = firestore().collection('programs')
     const snapshot = await db.doc(programId).get()
     const userDoc = await firestore().collection('users').doc(uid).get()
-    const userUpdate = await firestore().collection('users').doc(uid).update({ programs: firestore.FieldValue.arrayRemove(userDoc.data().programs.filter(program => program.id == programId))})
+    const userUpdate = await firestore().collection('users').doc(uid).update({ programs: firestore.FieldValue.arrayRemove(userDoc.data().programs.filter(program => program.id == programId)[0])})
     for (const user of snapshot.data().users) {
         const customerDoc = await firestore().collection('customers').doc(user.phoneNum).get()
         const notify = await firestore().collection('messages').add({ from: snapshot.data().phoneNum, to: user.phoneNum,

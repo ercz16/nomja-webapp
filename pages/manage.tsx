@@ -6,6 +6,7 @@ import { getSSRPropsUser } from '../utils/auth/ServerAuth'
 import { Dialog, Transition } from '@headlessui/react'
 import { Fragment, useState, useRef } from 'react'
 import { createClientProgram, deleteProgram } from '../utils/program/ProgramClientSide'
+import { format } from 'path'
 
 export const getServerSideProps = async (ctx) => {
     const props = await getSSRPropsUser(ctx)
@@ -124,7 +125,7 @@ const CreateModal = (props) => {
 }
 
 const Manage = (props) => {
-    const { user } = props
+    const { user, programs } = props
     const [createOpen, setCreateOpen] = useState(false)
 
     const openCreate = () => {
@@ -158,7 +159,8 @@ const Manage = (props) => {
                 </div>
                 <CreateModal user={user} isOpen={createOpen} open={() => setCreateOpen(true)} close={() => setCreateOpen(false)} />
                 <div className="grid grid-cols-5 gap-4 py-8">
-                    { user.programs.map((program) => {
+                    { programs.length == 0 ? <NoPrograms open={() => openCreate()} /> :
+                    programs.map((program) => {
                         return <ProgramCard key={program.id} program={program} user={user} />
                     })}
                 </div>
@@ -168,9 +170,30 @@ const Manage = (props) => {
     )
 }
 
+const NoPrograms = (props) => {
+    const { open } = props
+    return (
+        <>
+        <div className="absolute flex flex-col items-center text-gray-800 top-2/4 left-2/4" style={{ transform: 'translate(-50%, -50%)'}}>
+            <p className="text-xl text-medium">It appears you haven't created a program</p>
+            <p className="text-lg"><a onClick={() => open()} className="font-medium text-red-500 cursor-pointer hover:text-red-600 hover:underline">Click here</a> to create one</p>
+        </div>
+        </>
+    )
+}
+
+const formatPhoneNumber = (phoneNumberString) => { 
+    var cleaned = ('' + phoneNumberString).replace(/\D/g, '');
+    var match = cleaned.match(/^(1|)?(\d{3})(\d{3})(\d{4})$/);
+    if (match) {
+      var intlCode = (match[1] ? '+1 ' : '');
+      return [intlCode, '(', match[2], ') ', match[3], '-', match[4]].join('');
+    }
+    return null;
+}
+
 const ProgramCard = (props) => {
     const { program, user } = props
-
     const router = useRouter()
 
     const handleOptions = async (e) => {
@@ -179,13 +202,22 @@ const ProgramCard = (props) => {
 
     const [optionsOpen, setOptionsOpen] = useState(false)
 
+    const handleDelete = async () => {
+        try {
+            const del = await deleteProgram(user.login.uid, program.id)
+            router.reload()
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
     return (
         <>
             <div key={program.id} className="flex flex-col gap-2 px-4 py-3 bg-white rounded-md shadow-sm">
                 <div className="relative grid items-center grid-cols-3">
-                    <p className="col-span-2 text-xl font-medium">{program.name}</p>
+                    <p className="col-span-2 gap-1 text-xl font-medium">{program.name}</p>
                     <div className={!optionsOpen ? "hidden" : "bg-white absolute right-0 col-span-1 p-2 border border-gray-300 text-sm text-gray-800 hover:text-gray-900 rounded mt-11"}>
-                        <a onClick={() => deleteProgram(user, program.id)} className="flex flex-row items-center gap-1 p-1 font-medium rounded cursor-pointer hover:bg-gray-100">
+                        <a onClick={() => handleDelete()} className="flex flex-row items-center gap-1 p-1 font-medium rounded cursor-pointer hover:bg-gray-100">
                             Delete
                             <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 ml-auto" viewBox="0 0 20 20" fill="currentColor">
                                 <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
@@ -205,11 +237,11 @@ const ProgramCard = (props) => {
                     </div>
                 </div>
                 <div className="flex flex-col mb-1 -mt-3">
+                    <p className="text-lg text-gray-600">{ formatPhoneNumber(program.phoneNum) }</p>
                     <p className="flex flex-row items-center gap-1 text-gray-500">
                         <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3 text-green-500 fill-current" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>    
-                        
                         Free Trial
                     </p>
                 </div>

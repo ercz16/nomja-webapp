@@ -2,6 +2,8 @@ import { useState, Fragment, useRef } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { createReward } from '../../utils/program/rewards/Reward'
 import { useRouter } from 'next/router'
+import { nanoid } from 'nanoid'
+import firebase from '../../utils/firebase/Firebase'
 
 enum RewardType {
     VISIT = "VISIT",
@@ -20,11 +22,19 @@ const getRequiredText = (type, required) => {
 }
 
 const Rewards = (props) => {
-    let [isOpen, setIsOpen] = useState(false)
     const { program, user } = props
+    const router = useRouter()
+    const [isOpen, setIsOpen] = useState(false)
 
     const handleDelete = async (e, rewardId) => {
         e.stopPropagation()
+        try {
+            const update = await firebase.firestore().collection('programs').doc(program.id).update({ rewards: 
+                firebase.firestore.FieldValue.arrayRemove(program.rewards.filter(reward => reward.id == rewardId)[0]) })
+            router.reload()
+        } catch (e) {
+            console.log(e)
+        }
     }
 
     const closeCreate = () => {
@@ -61,16 +71,16 @@ const Rewards = (props) => {
                             { program.rewards.length > 0 ? "" : 
                                 (
                                     <>
-                                    <div className="absolute flex flex-col text-lg text-center left-2/4 top-2/4" style={{ transform: 'translate(-50%, -50%)'}}>
-                                        <p>It appears you do not have created any rewards.</p>
-                                        <p><a className="font-medium text-blue-500 cursor-pointer hover:text-blue-600" onClick={openCreate}>Click here</a> to create one.</p>
+                                    <div className="absolute flex flex-col text-center text-gray-800 left-2/4 top-2/4" style={{ transform: 'translate(-50%, -50%)'}}>
+                                        <p className="text-xl">It appears you do not have created any rewards</p>
+                                        <p><a className="text-lg font-medium text-red-500 cursor-pointer hover:underline hover:text-red-600" onClick={openCreate}>Click here</a> to create one</p>
                                     </div>
                                     </>
                                 )
                             }
                             { program.rewards.map((reward) => {
                                 return (
-                                    <div key={reward.id} onClick={() => alert('dab')} className="px-4 py-3 bg-white rounded shadow cursor-pointer hover:shadow-md">
+                                    <div key={reward.id} className="px-4 py-3 bg-white rounded shadow cursor-pointer hover:shadow-md">
                                         <div className="flex flex-col gap-2">
                                             <div className="flex flex-row items-center">
                                                 <div className="flex flex-col">
@@ -114,7 +124,7 @@ const CreateModal = (props) => {
         const { name, description, required, activeUntil, discountPercentage } = e.target
 
         try {
-            const reward = await createReward(user.login.uid, program.id, { name: name.value, description: description.value != undefined ? description.value : "", attributes: {
+            const reward = await createReward(user.login.uid, program.id, { id: nanoid(16), name: name.value, description: description.value != undefined ? description.value : "", attributes: {
                 type: type, required: required.value != undefined ? required.value : "", activeUntil: activeUntil.value != undefined ? activeUntil.value : new Date(new Date().setFullYear(new Date().getFullYear() + 100))
                 , discount: discountPercentage != undefined ? discountPercentage.value : "" }})
             router.reload()
@@ -197,10 +207,10 @@ const CreateModal = (props) => {
                                     <input type="radio" onChange={(e) => setType(RewardType.POINTS)} className="form-radio" name="accountType" value="points" />
                                     <span className="ml-2">Point based</span>
                                 </label>
-                                <label className="inline-flex items-center text-md">
+                                {/*<label className="inline-flex items-center text-md">
                                     <input type="radio" onChange={(e) => setType(RewardType.DISCOUNT)} className="form-radio" name="accountType" value="discount" />
                                     <span className="ml-2">Discount</span>
-                                </label>
+                                </label>*/}
                             </div>
                         </div>
                         { getRewardTypeOptions(type) }

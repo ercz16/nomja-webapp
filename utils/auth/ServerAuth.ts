@@ -29,9 +29,16 @@ const getSSRAuth = async (ctx) => {
 const getSSRPropsUser = async (ctx) => {
   try {
     const user = await getSSRAuth(ctx)
+    const programs = new Array()
+    for (const program of user.programs) {
+      const doc = await firebaseAdmin.firestore().collection('programs').doc(program.id).get()
+      const data = doc.data()
+      programs.push({ id: data.id, name: data.name, users: data.users, rewards: data.rewards, phoneNum: data.phoneNum })
+    }
     return {
       props: {
         user: user,
+        programs: programs
       },
     }
   } catch (e) {
@@ -50,10 +57,16 @@ const getSSRPropsProgram = async (ctx) => {
   try {
     const user = await getSSRAuth(ctx)
     const program = await fetchSSRInfo(id)
+    const customers = new Array()
+    for (const customer of program.users) {
+      const doc = await firebaseAdmin.firestore().collection('customers').doc(customer.phoneNum).get()
+      customers.push(doc.data())
+    }
     return {
       props: {
         user: user,
         program: program,
+        customers: customers
       },
     }
   } catch (e) {
@@ -68,60 +81,85 @@ const getSSRPropsProgram = async (ctx) => {
 }
 
 const getSSRPropsRedeem = async (ctx) => {
-  const { id, p } = ctx.query
+  const { id } = ctx.query
 
-  try {
-    if (!id || !p) throw new Error('Invalid ID or Program ID')
+  const db = firebaseAdmin.firestore().collection('spendLinks')
+  const snapshot = await db.doc(id).get()
 
-    const idDoc = await firebaseAdmin
-      .firestore()
-      .collection('redeemShorts')
-      .doc(id)
-      .get()
-    if (!idDoc.exists) throw new Error('Invalid Customer ID')
-    const idData = idDoc.data()
-    if (new Date().getTime() > new Date(idData.expire).getTime())
-      throw new Error('Expired')
-
-    const customer = await firebaseAdmin
-      .firestore()
-      .collection('customers')
-      .doc(idData.userRedirect)
-      .get()
-    if (!customer.exists) throw new Error('Invalid User ID')
-    const customerData = customer.data()
-
-    const customerProgramData = customerData.programs.filter(
-      (program) => program.id == idData.programRedirect
-    )
-    if (!customerProgramData) throw new Error('User is not in said program')
-    var points = customerProgramData.points
-
-    const program = await firebaseAdmin
-      .firestore()
-      .collection('programs')
-      .doc(idData.programRedirect)
-      .get()
-    if (!program.exists) throw new Error('Program ID does not exist')
-    const programData = program.data()
-
-    const rewards = programData.rewards.filter(
-      (reward) =>
-        reward.attributes.type == 'points' &&
-        reward.attributes.requirement <= points
-    )
+  if (!snapshot.exists) {
     return {
       props: {
-        available: rewards,
-      },
-    }
-  } catch (e) {
-    return {
-      props: {
-        available: [],
-      },
+        expired: false,
+        error: true
+      }
     }
   }
+
+  const customer = await firebaseAdmin.firestore().collection('customers').doc(snapshot.data().redirect.customer).get()
+  const program = await firebaseAdmin.firestore().collection('programs').doc(snapshot.data().redirect.program).get()
+
+  if (!customer.exists || !program.exists) {
+    return {
+      props: {
+        expired: false,
+        error: true,
+        rewards: []
+      }
+    }
+  }
+
+  if (new Date().getTime() > new Date(snapshot.data().expire).getTime()) {
+    return {
+      props: {
+        expired: true,
+        error: true,
+        rewards: []
+      }
+    }
+  }
+
+  var totalPoints = 0, totalVisits = 0
+  customer.data().rewards.forEach(reward => {
+    if (reward.phoneNum == program.data().phoneNum) {
+      switch (reward.type) {
+        case "POINTS":
+          totalPoints += reward.amount
+          break
+        case "VISIT":
+          totalVisits++
+          break
+      }
+    }
+  })
+
+  var availableRewards = new Array(0)
+  for (const reward of program.data().rewards) {
+    switch (reward.attributes.type) {
+      case "POINTS":
+        if (reward.attributes.required <= totalPoints) {
+          availableRewards.push({ reward: reward, program: program.data().id })
+        }
+        break
+      case "VISIT":
+        if (reward.attributes.required <= totalVisits) {
+          availableRewards.push({ reward: reward, program: program.data().id })
+        }
+        break 
+    }
+  }
+
+  return {
+    props: {
+      expired: false,
+      error: false,
+      rewards: availableRewards,
+      points: totalPoints,
+      visits: totalVisits,
+      customer: customer.data(),
+      program: { name: program.data().name }
+    }
+  }
+
 }
 
 export { getSSRAuth, getSSRPropsUser, getSSRPropsProgram, getSSRPropsRedeem }

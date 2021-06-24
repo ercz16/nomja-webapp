@@ -9,6 +9,7 @@ enum RewardType {
 }
 
 interface IRewardOptions {
+    id: string,
     name: string,
     description?: string,
     attributes: {
