@@ -47,7 +47,7 @@ const deleteProgram = async (uid, programId) => {
         const notify = await firestore().collection('messages').add({ from: snapshot.data().phoneNum, to: user.phoneNum,
              body: `${snapshot.data().uniqueCode} has been deleted. You will no longer receive texts from this number.`})
         const customerUpdate = await firestore().collection('customers').doc(user.phoneNum).update({ programs: 
-            firestore.FieldValue.arrayRemove(customerDoc.data().programs.filter(program => program.id == snapshot.data().id)) })
+            firestore.FieldValue.arrayRemove(customerDoc.data().programs.filter(program => program.id == snapshot.data().id)[0]) })
     }
     deleteProgramFunc({ program: snapshot.data() })
     const deletion = await db.doc(programId).delete()
