@@ -8,4 +8,9 @@ const fetchSSRInfo = async (id) => {
     return data
 }
 
+interface IProgramOptions { 
+    name: string,
+    description?: string
+}
+
 export { fetchSSRInfo } 
