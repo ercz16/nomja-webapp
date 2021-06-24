@@ -185,6 +185,7 @@ const handleText = async (text: string, to: string, from: string) => {
 }
 
 const handler = async (req, res) => {
+    if (req.method != 'POST') return res.status(400).json({ errors: [{ message: 'Invalid request method' }]})
     const { From, To, Text, MediaCount} = req.body
     var hasMedia = MediaCount
     if (!hasMedia) {
