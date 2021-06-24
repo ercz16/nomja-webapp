@@ -6,9 +6,8 @@ import Router from "next/router"
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { AuthProvider } from '../utils/auth/AuthProvider'
-import { fb } from '../utils/firebase/Firebase'
-
-const analytics = fb().analytics
+import firebase, { app } from '../utils/firebase/Firebase'
+const analytics = firebase.analytics
 
 const progress = new ProgressBar({
   size: 2,

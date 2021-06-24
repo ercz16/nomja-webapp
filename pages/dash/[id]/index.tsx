@@ -7,9 +7,8 @@ import QRCode from 'qrcode'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { getSSRPropsProgram } from '../../../utils/auth/ServerAuth'
-import { fb } from '../../../utils/firebase/Firebase'
-
-const firestore = fb().firestore, auth = fb().auth
+import firebase from '../../../utils/firebase/Firebase'
+const firestore = firebase.firestore, auth = firebase.auth
 
 const getPages = (props) => {
     const { program, user } = props

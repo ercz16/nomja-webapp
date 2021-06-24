@@ -1,7 +1,6 @@
 import { nanoid } from 'nanoid'
-import { fb } from '../firebase/Firebase'
-
-const firestore = fb().firestore, auth = fb().auth
+import firebase from '../firebase/Firebase'
+const firestore = firebase.firestore, auth = firebase.auth
 
 interface ISignUpOptions {
     first: string,

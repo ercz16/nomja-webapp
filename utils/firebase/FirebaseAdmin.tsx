@@ -1,6 +1,6 @@
 import * as firebaseAdmin from "firebase-admin";
   
-if (!firebaseAdmin.apps.length) {
+try {
   firebaseAdmin.initializeApp({
     credential: firebaseAdmin.credential.cert({
       projectId: 'nomja-c0d40',
@@ -9,6 +9,10 @@ if (!firebaseAdmin.apps.length) {
     }),
     databaseURL: `https://nomja-c0d40-default-rtdb.firebaseio.com`,
   })
+} catch (e) {
+  if (!/already exists/u.test(e.message)) {
+    console.error('Firebase Admin Init Error', e.stack)
+  }
 }
-  
+
 export { firebaseAdmin }

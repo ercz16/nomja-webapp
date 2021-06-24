@@ -1,7 +1,6 @@
 import { nanoid } from 'nanoid'
-import { fb } from '../firebase/Firebase'
-
-const firestore = fb().firestore
+import firebase from '../firebase/Firebase'
+const firestore = firebase.firestore, auth = firebase.auth, functions = firebase.functions
 
 interface IProgramOptions { 
     name: string,
@@ -9,8 +8,10 @@ interface IProgramOptions {
     uniqueCode: string
 }
 
-var assignPhoneNumber = fb().functions().httpsCallable('assignPhoneNumber')
-var deleteProgramFunc = fb().functions().httpsCallable('deleteProgram')
+console.log(firebase.app)
+
+var assignPhoneNumber = functions().httpsCallable('assignPhoneNumber')
+var deleteProgramFunc = functions().httpsCallable('deleteProgram')
 
 const createClientProgram = async (user, options: IProgramOptions) => {
     const programId = nanoid(16)

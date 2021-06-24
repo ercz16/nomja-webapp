@@ -1,8 +1,7 @@
 import { useState, useEffect, useContext, createContext } from 'react'
 import nookies from 'nookies'
-import { fb } from '../firebase/Firebase'
-
-const firestore = fb().firestore, auth = fb().auth
+import firebase from '../firebase/Firebase'
+const firestore = firebase.firestore, auth = firebase.auth
 
 const AuthContext = createContext({ user: null })
 
