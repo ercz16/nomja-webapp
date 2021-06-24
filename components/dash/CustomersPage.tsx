@@ -13,7 +13,7 @@ const CustomerModal = (props) => {
           <Transition appear show={isOpen} as={Fragment}>
             <Dialog
               as="div"
-              className="fixed inset-0 z-10 overflow-y-auto"
+              className="fixed inset-0 z-10 mt-8 overflow-y-auto"
               onClose={close}
             >
               <div className="min-h-screen px-4 text-center">
@@ -112,13 +112,13 @@ const Customers = (props) => {
     return (
         <>
             <div className="px-16 py-8">
-                <CustomerModal program={program} selected={selected} isOpen={modalOpen} close={close} open={open} />
                 <div className="flex flex-col divide-y-2">
                     <div className="flex flex-col">
                         <p className="text-xl font-semibold">Customers</p>
                         <p className="text-lg text-gray-500">View the customers that use your rewards. Click on one to view more information.</p>
                     </div>
                     <div className="pt-3">
+                      <CustomerModal program={program} selected={selected} isOpen={modalOpen} close={close} open={open} />
                         {/*<CustomerModal selected={selected} isOpen={modalOpen} open={() => open()} close={() => close()} />*/}
                         <div className="grid grid-rows-1 p-3 bg-white rounded gap-y-2">
                             <div className="grid grid-cols-5 p-2 text-lg font-semibold text-gray-600 uppercase border-b-2 border-gray-300">
