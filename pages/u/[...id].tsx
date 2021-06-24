@@ -5,13 +5,31 @@ export const getServerSideProps = async (ctx) => {
     return props
 }
 
+const None = (props) => {
+    return (
+        <>
+        <p>hello</p>
+        </>
+    )
+}
+
+const Rewards = (props) => {
+    return (
+        <>
+        <p>hello world</p>
+        </>
+    )
+}
+
 const RewardRedeem = (props) => {
-    console.log(props)
     const { available } = props
 
     return (
         <>
-        <p>hello world!</p>
+        { available.length == 0 ?
+        <None />    
+        :
+        <Rewards available={available} />}
         </>
     )
 }

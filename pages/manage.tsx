@@ -1,9 +1,11 @@
 import Link from 'next/link'
+import Head from 'next/head'
 
 import { useRouter } from 'next/router'
 import { getSSRPropsUser } from '../utils/auth/ServerAuth'
 import { Dialog, Transition } from '@headlessui/react'
 import { Fragment, useState, useRef } from 'react'
+import { createClientProgram } from '../utils/program/ProgramClientSide'
 
 export const getServerSideProps = async (ctx) => {
     const props = await getSSRPropsUser(ctx)
@@ -11,16 +13,23 @@ export const getServerSideProps = async (ctx) => {
 }
 
 const CreateModal = (props) => {
-    const { isOpen, close, open } = props
+    const { user, isOpen, close, open } = props
+
+    const router = useRouter()
 
     const submit = useRef(null)
 
     const handleSubmit = async (e) => {
         e.preventDefault()
 
-        const { name } = e.target
+        const { name, description, uniqueCode } = e.target
 
-        console.log(name.value)
+        try {
+            const program = await createClientProgram(user.login.uid, { name: name.value, description:  description.value, uniqueCode: uniqueCode.value }) 
+            router.push('/dash/' + program.id)
+        } catch (e) {
+            console.log(e)
+        }
     }
 
     return (
@@ -35,10 +44,10 @@ const CreateModal = (props) => {
               <div className="min-h-screen px-4 text-center">
                 <Transition.Child
                   as={Fragment}
-                  enter="ease-out duration-300"
+                  enter="ease-out duration-100"
                   enterFrom="opacity-0"
                   enterTo="opacity-100"
-                  leave="ease-in duration-200"
+                  leave="ease-in duration-100"
                   leaveFrom="opacity-100"
                   leaveTo="opacity-0"
                 >
@@ -54,10 +63,10 @@ const CreateModal = (props) => {
                 </span>
                 <Transition.Child
                   as={Fragment}
-                  enter="ease-out duration-300"
+                  enter="ease-out duration-100"
                   enterFrom="opacity-0 scale-95"
                   enterTo="opacity-100 scale-100"
-                  leave="ease-in duration-200"
+                  leave="ease-in duration-100"
                   leaveFrom="opacity-100 scale-100"
                   leaveTo="opacity-0 scale-95"
                 >
@@ -75,6 +84,14 @@ const CreateModal = (props) => {
                             <div className="flex flex-col col-span-2 gap-0">
                                 <p className="font-lg text-md">Name</p>
                                 <input name="name" className="px-2 py-1 border border-gray-300 rounded shadow-sm font-lg" placeholder="Ex. Joe's Crabshack" />
+                            </div>
+                            <div className="flex flex-col col-span-4 col-start-1 gap-0">
+                                <p className="flex flex-row items-center gap-1 font-lg text-md">Description <span className="text-gray-500">(optional)</span></p>
+                                <input name="description" className="px-2 py-1 border border-gray-300 rounded shadow-sm font-lg" placeholder="Ex. A restaurant from the ocean" />
+                            </div>
+                            <div className="flex flex-col col-span-4 col-start-1 gap-0">
+                                <p className="flex flex-row items-center gap-1 font-lg text-md">Unique Code <span className="text-gray-500">(used to join the program through text)</span></p>
+                                <input name="uniqueCode" className="px-2 py-1 border border-gray-300 rounded shadow-sm font-lg" placeholder="Ex. joescrab" />
                             </div>
                             <button ref={submit} className="hidden" type="submit" />
                         </form>
@@ -94,7 +111,7 @@ const CreateModal = (props) => {
 
 const Manage = (props) => {
     const { user } = props
-    const [createOpen, setCreateOpen] = useState(true)
+    const [createOpen, setCreateOpen] = useState(false)
 
     const openCreate = () => {
         setCreateOpen(true)
@@ -106,9 +123,12 @@ const Manage = (props) => {
     
     return (
         <>
+        <Head>
+            <title>Manage - Nomja</title>
+        </Head>
         <div className="min-h-screen bg-gray-100">
             <div className="grid grid-cols-12 p-4 mb-5 bg-gray-900">
-                <div className="col-span-1 col-start-2">
+                <div className="col-span-2 col-start-2">
                     <img src="/all-together.png" className="h-10" />
                 </div>
             </div>
@@ -122,7 +142,7 @@ const Manage = (props) => {
                         </svg>
                     </button>
                 </div>
-                <CreateModal isOpen={createOpen} open={() => setCreateOpen(true)} close={() => setCreateOpen(false)} />
+                <CreateModal user={user} isOpen={createOpen} open={() => setCreateOpen(true)} close={() => setCreateOpen(false)} />
                 <div className="grid grid-cols-5 gap-4 py-8">
                     { user.programs.map((program) => {
                         return <ProgramCard program={program} />
@@ -176,7 +196,7 @@ const ProgramCard = (props) => {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>    
                         
-                        Free Plan
+                        Free Trial
                     </p>
                 </div>
                 <div className="flex flex-col -mt-3">

@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Head from 'next/head'
 
 import { signIn } from '../../utils/auth/ClientAuth'
 import { getSSRAuth } from '../../utils/auth/ServerAuth'
@@ -27,6 +28,9 @@ const SignIn = (props) => {
 
     return (
         <>
+        <Head>
+            <title>Sign in to your account - Nomja</title>
+        </Head>
             <div className="min-h-screen bg-gray-100">
                 <div className="fixed flex flex-col gap-6 top-2/4 left-2/4" style={{ transform: 'translate(-50%, -50%)' }}>
                     <div className="flex flex-col">

@@ -45,7 +45,7 @@ const getSSRPropsProgram = async (ctx) => {
     const { id } = ctx.query
     try {
         const user = await getSSRAuth(ctx)
-        const program = await fetchSSRInfo(id[0])
+        const program = await fetchSSRInfo(id)
         return {
             props: {
                 user: user,

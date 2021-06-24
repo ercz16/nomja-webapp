@@ -1,6 +1,7 @@
 import RewardsPage from '../../../components/dash/RewardsPage'
 import CustomersPage from '../../../components/dash/CustomersPage'
 import Link from 'next/link'
+import Head from 'next/head'
 
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -32,6 +33,9 @@ const Index = (props) => {
 
     return (
         <>
+        <Head>
+            <title>{ program.name } - Nomja</title>
+        </Head>
         <div className="h-screen bg-gray-100">
             <div className="grid items-center grid-cols-8 px-8 py-4 bg-gray-900">
                 <div className="col-span-1 p-1">

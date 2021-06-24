@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Head from 'next/head'
 
 import { signUp } from '../../utils/auth/ClientAuth'
 import { getSSRAuth } from '../../utils/auth/ServerAuth'
@@ -44,6 +45,7 @@ const scorePassword = (pass) => {
 
     return score
 }
+
 const getPasswordIndicator = (pass) => {
     const strength = checkPassStrength(pass)
     return (
@@ -86,10 +88,13 @@ const SignUp = (props) => {
 
     return (
         <>
+            <Head>
+                <title>Create an account - Nomja</title>
+            </Head>
             <div className="min-h-screen bg-gray-100">
                 <div className="fixed flex flex-col gap-6 top-2/4 left-2/4" style={{ transform: 'translate(-50%, -50%)' }}>
                     <div className="flex flex-col">
-                        <p className="text-3xl font-medium text-center text-gray-700">Sign up for an account</p>
+                        <p className="text-3xl font-medium text-center text-gray-700">Create an account</p>
                         <p className="flex flex-row justify-center text-xl text-gray-500 gap-x-1">or
                         <Link href="/auth/signin">
                             <a className="font-medium text-red-500">
@@ -126,7 +131,7 @@ const SignUp = (props) => {
                                 <input type="date" name="birthday" className="border border-gray-300 rounded shadow-sm" />
                             </div>
                             <div className="flex flex-col gap-1">
-                                <p className="flex flex-row items-center font-medium text-gray-600 gap-x-1">Phone number <p className="text-sm text-gray-500">(optional)</p></p>
+                                <p className="flex flex-row items-center font-medium text-gray-600 gap-x-1">Phone number <span className="text-sm text-gray-500">(optional)</span></p>
                                 <input type="text" name="phone" className="border border-gray-300 rounded shadow-sm" placeholder="(999) 999-9999" />
                             </div>
                             <div className="flex flex-col gap-1">

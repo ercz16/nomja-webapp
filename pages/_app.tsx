@@ -6,6 +6,7 @@ import Router from "next/router"
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { AuthProvider } from '../utils/auth/AuthProvider'
+import { analytics } from '../utils/firebase/Firebase'
 
 const progress = new ProgressBar({
   size: 2,
@@ -19,7 +20,7 @@ Router.events.on("routeChangeComplete", progress.finish)
 Router.events.on("routeChangeError", progress.finish)
 
 function MyApp({ Component, pageProps }) {
-  /*const router = useRouter()
+  const router = useRouter()
 
   useEffect(() => {
     if (process.env.NODE_ENV === 'production') {
@@ -36,7 +37,7 @@ function MyApp({ Component, pageProps }) {
         router.events.off('routeChangeComplete', logEvent);
       }
     }
-  }, [])*/
+  }, [])
 
   return (
     <AuthProvider>
