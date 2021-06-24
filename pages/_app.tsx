@@ -38,7 +38,7 @@ function MyApp({ Component, pageProps }) {
         router.events.off('routeChangeComplete', logEvent);
       }
     }
-  }, [])/*
+  }, [])*/
 
   return (
     <AuthProvider>
