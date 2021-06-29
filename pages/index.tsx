@@ -2,6 +2,7 @@ import { Fragment, useEffect, useRef, useState } from 'react'
 import { Menu, Transition } from '@headlessui/react'
 
 import Link from 'next/link'
+import Head from 'next/head'
 
 const Navbar = (props) => {
   return (
@@ -361,6 +362,9 @@ const Footer = () => {
 const HomePage = () => {
   return (
     <>
+      <Head>
+        <title>Nomja - Customer loyalty taken to the next level.</title>
+      </Head>
       <Navbar />
       <LandingSection />
       <HelpSection />

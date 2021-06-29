@@ -23,7 +23,7 @@ Router.events.on("routeChangeError", progress.finish)
 function MyApp({ Component, pageProps }) {
   const router = useRouter()
 
-  /*useEffect(() => {
+  useEffect(() => {
     if (process.env.NODE_ENV === 'production') {
       const logEvent = (url) => {
         analytics().setCurrentScreen(url)
@@ -38,7 +38,7 @@ function MyApp({ Component, pageProps }) {
         router.events.off('routeChangeComplete', logEvent);
       }
     }
-  }, [])*/
+  }, [])
 
   return (
     <AuthProvider>
