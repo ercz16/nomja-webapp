@@ -210,8 +210,8 @@ const handler = async (req, res) => {
         
         try {
             const [date, amount] = await search(base64response)
-            const customerPoints = await firebaseAdmin.firestore().collection('customers').doc(From).update({ rewards: firebaseAdmin.firestore.FieldValue.arrayUnion({ type: 'POINTS', amount: Math.floor(amount), phoneNum: To, date: new Date().toString() })})
-            const customerVisit = await firebaseAdmin.firestore().collection('customers').doc(From).update({ rewards: firebaseAdmin.firestore.FieldValue.arrayUnion({ type: 'VISIT', amount: 1, phoneNum: To, date: new Date().toString() })})
+            const customerPoints = await firebaseAdmin.firestore().collection('customers').doc(From).update({ rewards: firebaseAdmin.firestore.FieldValue.arrayUnion({ type: 'POINTS', purchaseDate: date.toString(), amount: Math.floor(amount), phoneNum: To, date: new Date().toString() })})
+            const customerVisit = await firebaseAdmin.firestore().collection('customers').doc(From).update({ rewards: firebaseAdmin.firestore.FieldValue.arrayUnion({ type: 'VISIT', purchaseDate: date.toString(), amount: 1, phoneNum: To, date: new Date().toString() })})
             const sent = await sendMessage(To, From, `Successfully redeemed your receipt for ${Math.floor(amount)} points and 1 visit!`)
             return res.status(200).json(sent)
         } catch (e) {
