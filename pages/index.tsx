@@ -377,4 +377,4 @@ const HomePage = () => {
 
 export default HomePage
 
-export { Navbar, Footer }
+export { Navbar, Footer, LandingSection }
