@@ -363,7 +363,7 @@ const HomePage = () => {
   return (
     <>
       <Head>
-        <title>Nomja - Customer loyalty taken to the next level.</title>
+        <title>Customer loyalty taken to the next level - Nomja</title>
       </Head>
       <Navbar />
       <LandingSection />

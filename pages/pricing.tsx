@@ -2,6 +2,8 @@ import { Navbar, Footer } from './index'
 import { useState } from 'react'
 import { Switch } from '@headlessui/react'
 
+import Head from 'next/head'
+
 enum Time {
     YEARLY,
     MONTHLY
@@ -136,6 +138,9 @@ const PricingSection = () => {
 const Pricing = () => {
     return (
         <>
+        <Head>
+            <title>Pricing - Nomja</title>
+        </Head>
         <Navbar shadow={false} />
         <PricingSection />
         <Footer />
