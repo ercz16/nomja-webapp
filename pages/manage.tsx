@@ -6,7 +6,6 @@ import { getSSRPropsUser } from '../utils/auth/ServerAuth'
 import { Dialog, Transition } from '@headlessui/react'
 import { Fragment, useState, useRef } from 'react'
 import { createClientProgram, deleteProgram } from '../utils/program/ProgramClientSide'
-import { format } from 'path'
 
 export const getServerSideProps = async (ctx) => {
     const props = await getSSRPropsUser(ctx)

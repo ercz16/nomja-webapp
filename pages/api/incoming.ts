@@ -2,6 +2,8 @@ import { firebaseAdmin } from '../../utils/firebase/FirebaseAdmin'
 import { search } from '../../utils/vision/Vision'
 import { nanoid } from 'nanoid'
 import axios from 'axios'
+import { PricingInterface } from 'plivo/dist/resources/pricings'
+import { METHODS } from 'http'
 
 const sendMessage = async (from, to, text) => {
     const db = await firebaseAdmin.firestore().collection('messages')
@@ -186,7 +188,7 @@ const handleText = async (text: string, to: string, from: string) => {
 
 const handler = async (req, res) => {
     if (req.method != 'POST') return res.status(400).json({ errors: [{ message: 'Invalid request method' }]})
-    const { From, To, Text, MediaCount} = req.body
+    const { From, To, Text, MediaCount } = req.body
     var hasMedia = MediaCount
     if (!hasMedia) {
         const toSend = await handleText(Text, To, From)
@@ -207,7 +209,7 @@ const handler = async (req, res) => {
         )
         
         try {
-            const amount = await search(base64response)
+            const [date, amount] = await search(base64response)
             const customerPoints = await firebaseAdmin.firestore().collection('customers').doc(From).update({ rewards: firebaseAdmin.firestore.FieldValue.arrayUnion({ type: 'POINTS', amount: Math.floor(amount), phoneNum: To, date: new Date().toString() })})
             const customerVisit = await firebaseAdmin.firestore().collection('customers').doc(From).update({ rewards: firebaseAdmin.firestore.FieldValue.arrayUnion({ type: 'VISIT', amount: 1, phoneNum: To, date: new Date().toString() })})
             const sent = await sendMessage(To, From, `Successfully redeemed your receipt for ${Math.floor(amount)} points and 1 visit!`)

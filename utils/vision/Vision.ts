@@ -1,4 +1,5 @@
-import { ImageAnnotatorClient } from "@google-cloud/vision";
+import { ImageAnnotatorClient } from "@google-cloud/vision"
+import extractDate from 'extract-date'
 
 const credentials = {
   client_email: "firebase-adminsdk-3n512@nomja-c0d40.iam.gserviceaccount.com",
@@ -18,7 +19,7 @@ function isFloat(n) {
   return false;
 }
 
-const search = async (path: Buffer) => {
+const search = async (path: Buffer): Promise<[Date, number]> => {
   const [result] = await visionClient.textDetection(path)
   const detections = result.textAnnotations
   const split = detections.map((desc) => desc.description)[0].split("\n")
@@ -34,7 +35,15 @@ const search = async (path: Buffer) => {
       );
     }
   }
-  return findMax(floats);
+
+  for (const line of split) {
+    const date = extractDate(line)
+    if (date.length > 0) {
+      return [new Date(date[0].date), findMax(floats)]
+    }
+  }
+
+  return [new Date(), findMax(floats)]
 }
 
 function findMax(floats) {
