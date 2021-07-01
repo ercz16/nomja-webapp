@@ -52,25 +52,25 @@ const Index = (props) => {
         <title>{program.name} - Nomja</title>
       </Head>
       <div className="h-screen bg-gray-100">
-        <div className="grid items-center grid-cols-8 px-8 py-4 bg-gray-900">
-          <div className="col-span-1 p-1">
+        <div className="flex justify-between items-center px-8 py-4 bg-gray-100">
+          <div className="p-1">
             <Link href="/manage">
               <a>
                 <img src="/all-together.png" className="h-9" />
               </a>
             </Link>
           </div>
-          <div className="flex flex-col col-start-8">
+          <div className="flex flex-col">
             <div
               onClick={() => setAccountDropdownOpen(true)}
-              className="flex flex-row items-center cursor-pointer gap-x-2"
+              className="flex justify-between items-center cursor-pointer gap-x-2"
             >
-              <p className="text-lg font-medium text-white">
+              <p className="text-lg font-medium">
                 {user.name.first + ' ' + user.name.last}
               </p>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="w-5 h-5 text-white fill-current"
+                className="w-5 h-5 fill-current"
                 viewBox="0 0 20 20"
                 fill="currentColor"
               >
@@ -114,18 +114,18 @@ const Index = (props) => {
             </div>
           </div>
         </div>
-        <div className="grid grid-cols-7">
-          <div className="h-screen col-span-1 bg-white shadow">
-            <div className="grid grid-rows-1 p-8 gap-y-6">
-              <div className="flex flex-col p-2 bg-gray-100 rounded shadow">
-                <p className="text-xl font-semibold text-gray-800">
+        <div className="flex">
+          <div className="h-screen bg-white shadow border-none">
+            <div className="flex flex-col justify-start p-5 gap-y-6 bg-gray-100 h-full">
+              <div className="flex flex-col px-6 pb-4 pt-2 bg-white shadow-xl">
+                <p className="text-xl font-medium text-gray-800 border-b-2 border-gray-300 text-center">
                   {program.name}
                 </p>
-                <p className="text-lg text-gray-500">{program.description}</p>
-                <p className="text-gray-500 text-md">@{program.uniqueCode}</p>
-                <p className="text-gray-500 text-md">
+                <p className="text-lg text-gray-500 text-center">{program.description}</p>
+                <p className="text-gray-500 text-md text-center mt-2">
                   {formatPhoneNumber(program.phoneNum)}
                 </p>
+                <p className="text-gray-500 text-md ml-3">@{program.uniqueCode}</p>
                 <a
                   className="mt-3 font-medium text-red-500 hover:underline hover:text-red-600"
                   href={program.qrcode}
@@ -189,7 +189,7 @@ const Index = (props) => {
                 </svg>
                 <p className="text-xl">Customers</p>
               </div>
-              <div className="flex flex-row items-center gap-4 p-2 text-gray-600 rounded cursor-pointer hover:text-gray-800 hover:bg-gray-100 hover:shadow-sm">
+              <div className="flex items-center gap-4 p-2 text-gray-600 rounded cursor-pointer hover:text-gray-800 hover:bg-gray-100 hover:shadow-sm">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="fill-current w-7 h-7"
@@ -202,7 +202,9 @@ const Index = (props) => {
               </div>
             </div>
           </div>
-          <div className="col-span-6">{currentPage}</div>
+
+          <div className="flex-grow bg-white rounded-2xl">{currentPage}</div>
+
         </div>
       </div>
     </>
