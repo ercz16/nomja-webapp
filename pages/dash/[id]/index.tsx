@@ -117,7 +117,7 @@ const Index = (props) => {
         <div className="flex">
           <div className="h-screen bg-white shadow border-none">
             <div className="flex flex-col justify-start p-5 gap-y-6 bg-gray-100 h-full">
-              <div className="flex flex-col px-6 pb-4 pt-2 bg-white shadow-xl">
+              <div className="flex flex-col px-6 pb-4 pt-2 bg-white shadow-xl rounded-md">
                 <p className="text-xl font-medium text-gray-800 border-b-2 border-gray-300 text-center">
                   {program.name}
                 </p>

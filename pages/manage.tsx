@@ -206,13 +206,11 @@ const Manage = (props) => {
         <title>Manage - Nomja</title>
       </Head>
       <div className="min-h-screen bg-gray-100">
-        <div className="grid grid-cols-12 p-4 mb-5 bg-gray-900">
-          <div className="col-span-2 col-start-2">
+        <div className="pl-20 flex p-4">
             <img src="/all-together.png" className="h-10" />
-          </div>
         </div>
-        <div className="container flex flex-col gap-2 px-8 mx-auto divide-y-2">
-          <div className="flex flex-row items-center p-2">
+        <div className="flex flex-col h-screen gap-2 px-5 py-5">
+          <div className="flex flex-row items-center w-11/12 px-2 pb-5 mx-auto border-b-2">
             <p className="text-2xl font-medium">Manage Programs</p>
             <button
               onClick={() => setCreateOpen(!createOpen)}
@@ -239,7 +237,7 @@ const Manage = (props) => {
             open={() => setCreateOpen(true)}
             close={() => setCreateOpen(false)}
           />
-          <div className="grid grid-cols-5 gap-4 py-8">
+          <div className="mt-7 grid grid-cols-4 place-items-stretch gap-10 mx-12">
             {programs.length == 0 ? (
               <NoPrograms open={() => openCreate()} />
             ) : (
@@ -314,9 +312,9 @@ const ProgramCard = (props) => {
     <>
       <div
         key={program.id}
-        className="flex flex-col gap-2 px-4 py-3 bg-white rounded-md shadow-sm"
+        className="flex flex-col space-y-4 px-10 pt-6 pb-10 bg-white rounded-md shadow-lg"
       >
-        <div className="relative grid items-center grid-cols-3">
+        <div className="relative flex justify-between items-center">
           <p className="col-span-2 gap-1 text-xl font-medium">{program.name}</p>
           <div
             className={
