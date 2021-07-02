@@ -121,11 +121,15 @@ const Index = (props) => {
                 <p className="text-xl font-medium text-gray-800 border-b-2 border-gray-300 text-center">
                   {program.name}
                 </p>
-                <p className="text-lg text-gray-500 text-center">{program.description}</p>
+                <p className="text-lg text-gray-500 text-center">
+                  {program.description}
+                </p>
                 <p className="text-gray-500 text-md text-center mt-2">
                   {formatPhoneNumber(program.phoneNum)}
                 </p>
-                <p className="text-gray-500 text-md ml-3">@{program.uniqueCode}</p>
+                <p className="text-gray-500 text-md ml-3">
+                  @{program.uniqueCode}
+                </p>
                 <a
                   className="mt-3 font-medium text-red-500 hover:underline hover:text-red-600"
                   href={program.qrcode}
@@ -204,7 +208,6 @@ const Index = (props) => {
           </div>
 
           <div className="flex-grow bg-white rounded-2xl">{currentPage}</div>
-
         </div>
       </div>
     </>

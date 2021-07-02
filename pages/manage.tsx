@@ -1,191 +1,25 @@
+import { Fragment, useState, useRef } from 'react'
+
 import Link from 'next/link'
 import Head from 'next/head'
-
 import { useRouter } from 'next/router'
+
 import { getSSRPropsUser } from '../utils/auth/ServerAuth'
 import { Dialog, Transition } from '@headlessui/react'
-import { Fragment, useState, useRef } from 'react'
+
+import CreateProgramModal from '../components/modals/CreateProgramModal'
+import CreateButton from '../components/buttons/CreateButton'
+
 import {
   createClientProgram,
   deleteProgram,
 } from '../utils/program/ProgramClientSide'
+
 import { format } from 'path'
 
 export const getServerSideProps = async (ctx) => {
   const props = await getSSRPropsUser(ctx)
   return props
-}
-
-const CreateModal = (props) => {
-  const { user, isOpen, close, open } = props
-  const router = useRouter()
-  const submit = useRef(null)
-
-  const [loading, setLoading] = useState(false)
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-
-    setLoading(true)
-
-    const { name, description, uniqueCode } = e.target
-
-    try {
-      const program = await createClientProgram(user, {
-        name: name.value,
-        description: description.value,
-        uniqueCode: uniqueCode.value,
-      })
-      router.push('/dash/' + program.id)
-    } catch (e) {
-      console.log(e)
-      setLoading(false)
-    }
-  }
-
-  return (
-    <>
-      <Transition appear show={isOpen} as={Fragment}>
-        <Dialog
-          as="div"
-          className="fixed inset-0 z-10 overflow-y-auto"
-          onClose={close}
-        >
-          <Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
-          <div className="min-h-screen px-4 text-center">
-            <Transition.Child
-              as={Fragment}
-              enter="ease-out duration-100"
-              enterFrom="opacity-0"
-              enterTo="opacity-100"
-              leave="ease-in duration-100"
-              leaveFrom="opacity-100"
-              leaveTo="opacity-0"
-            >
-              <Dialog.Overlay className="fixed inset-0" />
-            </Transition.Child>
-
-            {/* This element is to trick the browser into centering the modal contents. */}
-            <span
-              className="inline-block h-screen align-middle"
-              aria-hidden="true"
-            >
-              &#8203;
-            </span>
-            <Transition.Child
-              as={Fragment}
-              enter="ease-out duration-100"
-              enterFrom="opacity-0 scale-95"
-              enterTo="opacity-100 scale-100"
-              leave="ease-in duration-100"
-              leaveFrom="opacity-100 scale-100"
-              leaveTo="opacity-0 scale-95"
-            >
-              <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white rounded-md shadow">
-                <Dialog.Title as="h3" className="text-xl font-medium">
-                  Create a program
-                </Dialog.Title>
-                <p className="text-gray-500 text-md">
-                  Fill out the form below to create a new program.
-                </p>
-
-                <div className="flex flex-col gap-4">
-                  <form
-                    onSubmit={handleSubmit}
-                    className="grid grid-cols-4 gap-2 py-4"
-                  >
-                    <div className="flex flex-col col-span-2 gap-0">
-                      <p className="font-lg text-md">Name</p>
-                      <input
-                        name="name"
-                        className="px-2 py-1 border border-gray-300 rounded shadow-sm font-lg"
-                        placeholder="Ex. Joe's Crabshack"
-                      />
-                    </div>
-                    <div className="flex flex-col col-span-4 col-start-1 gap-0">
-                      <p className="flex flex-row items-center gap-1 font-lg text-md">
-                        Description{' '}
-                        <span className="text-gray-500">(optional)</span>
-                      </p>
-                      <input
-                        name="description"
-                        className="px-2 py-1 border border-gray-300 rounded shadow-sm font-lg"
-                        placeholder="Ex. A restaurant from the ocean"
-                      />
-                    </div>
-                    <div className="flex flex-col col-span-4 col-start-1 gap-0">
-                      <p className="flex flex-row items-center gap-1 font-lg text-md">
-                        Unique Code{' '}
-                        <span className="text-gray-500">
-                          (used to join the program through text)
-                        </span>
-                      </p>
-                      <input
-                        name="uniqueCode"
-                        className="px-2 py-1 border border-gray-300 rounded shadow-sm font-lg"
-                        placeholder="Ex. joescrab"
-                      />
-                    </div>
-                    <button ref={submit} className="hidden" type="submit" />
-                  </form>
-                  <div className="flex flex-row items-center justify-end gap-4 text-lg">
-                    <button
-                      disabled={loading}
-                      onClick={() => close()}
-                      className={
-                        !loading
-                          ? 'px-3 py-1 text-gray-800 bg-gray-200 rounded shadow-sm hover:text-gray-900 hover:bg-gray-300'
-                          : 'px-3 py-1 text-gray-800 cursor-not-allowed bg-gray-100 rounded shadow-sm'
-                      }
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      disabled={loading}
-                      onClick={() => submit.current.click()}
-                      className={
-                        !loading
-                          ? 'px-3 py-1 text-white bg-red-500 rounded shadow-sm hover:bg-red-600'
-                          : 'px-3 py-1 text-white bg-red-400 rounded shadow-sm cursor-not-allowed flex flex-row items-center'
-                      }
-                    >
-                      {!loading ? (
-                        'Create'
-                      ) : (
-                        <>
-                          Create
-                          <svg
-                            className="w-5 h-5 ml-2 animate-spin"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                          >
-                            <circle
-                              className="opacity-25"
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                            ></circle>
-                            <path
-                              className="opacity-75"
-                              fill="currentColor"
-                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                            ></path>
-                          </svg>
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </Transition.Child>
-          </div>
-        </Dialog>
-      </Transition>
-    </>
-  )
 }
 
 const Manage = (props) => {
@@ -207,31 +41,16 @@ const Manage = (props) => {
       </Head>
       <div className="min-h-screen bg-gray-100">
         <div className="pl-20 flex p-4">
-            <img src="/all-together.png" className="h-10" />
+          <img src="/all-together.png" className="h-10" />
         </div>
         <div className="flex flex-col h-screen gap-2 px-5 py-5">
-          <div className="flex flex-row items-center w-11/12 px-2 pb-5 mx-auto border-b-2">
+          <div className="flex flex-row justify-between items-center w-11/12 px-2 pb-5 mx-auto border-b-2">
             <p className="text-2xl font-medium">Manage Programs</p>
-            <button
-              onClick={() => setCreateOpen(!createOpen)}
-              className="flex flex-row items-center gap-1 px-3 py-1 ml-auto text-xl font-medium text-white bg-red-500 rounded shadow-sm hover:bg-red-600 focus:outline-none"
-            >
+            <CreateButton action={() => setCreateOpen(!createOpen)}>
               Create New
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-6 h-6"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
+            </CreateButton>
           </div>
-          <CreateModal
+          <CreateProgramModal
             user={user}
             isOpen={createOpen}
             open={() => setCreateOpen(true)}
