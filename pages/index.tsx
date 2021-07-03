@@ -8,7 +8,7 @@ const Navbar = (props) => {
   return (
     <div className="relative z-10 flex flex-row items-center justify-between p-4 px-32 bg-white shadow-sm">
       <Link href='/'>
-        <a className="text-6xl font-extrabold text-red-500 hover:text-red-600">nomja</a>
+        <a className="text-6xl font-extrabold text-indigo-500 hover:text-indigo-600">nomja</a>
       </Link>
       <div className="flex flex-row items-center gap-4">
         <Link href="/features">
@@ -40,7 +40,7 @@ const Navbar = (props) => {
                     <div className="flex flex-col col-span-1 gap-2 p-2">
                       <Link href='/resources/request-demo'>
                         <a className="flex flex-row items-center gap-2 text-lg text-gray-800 rounded hover:text-black hover:underline">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 p-1 text-white bg-red-500 rounded-lg fill-current" viewBox="0 0 20 20" fill="currentColor">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 p-1 text-white bg-indigo-500 rounded-lg fill-current" viewBox="0 0 20 20" fill="currentColor">
                             <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
                           </svg>
                           Demo
@@ -48,7 +48,7 @@ const Navbar = (props) => {
                       </Link>
                       <Link href='/resources/help-center'>
                         <a className="flex flex-row items-center gap-2 text-lg text-gray-800 rounded hover:text-black hover:underline">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 p-1 text-white bg-red-500 rounded-lg fill-current" viewBox="0 0 20 20" fill="currentColor">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 p-1 text-white bg-indigo-500 rounded-lg fill-current" viewBox="0 0 20 20" fill="currentColor">
                             <path fillRule="evenodd" d="M9 3a1 1 0 012 0v5.5a.5.5 0 001 0V4a1 1 0 112 0v4.5a.5.5 0 001 0V6a1 1 0 112 0v5a7 7 0 11-14 0V9a1 1 0 012 0v2.5a.5.5 0 001 0V4a1 1 0 012 0v4.5a.5.5 0 001 0V3z" clipRule="evenodd" />
                           </svg>
                           Help Center
@@ -120,12 +120,12 @@ const Navbar = (props) => {
           </Transition>
         </Menu>
         <Link href="/auth/signin">
-          <button className="px-2 py-1 text-xl font-semibold text-red-500 border-2 border-red-500 rounded hover:text-red-600 hover:border-red-600">
+          <button className="px-2 py-1 text-xl font-semibold text-indigo-500 border-2 border-indigo-500 rounded-lg hover:text-indigo-600 hover:border-indigo-600">
             Sign in
           </button>
         </Link>
         <Link href="/auth/signup">
-          <button className="px-2 py-1 text-xl font-semibold text-white bg-red-500 border-2 border-red-500 rounded hover:bg-red-600 hover:border-red-600">
+          <button className="px-2 py-1 text-xl font-semibold text-white bg-indigo-500 border-2 border-indigo-500 rounded-lg hover:bg-indigo-600 hover:border-indigo-600">
             Create Account
           </button>
         </Link>
@@ -144,11 +144,11 @@ const LandingSection = () => {
       </div>
       <div className="relative grid items-center grid-cols-2 gap-12 px-32 py-32 shadow-b-lg">
         <div className="flex flex-col gap-6">
-          <p className="text-5xl font-bold text-gray-800">Grow your company with an modernized <span className="inline text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-red-400 to-red-600">rewards</span> system</p>
+          <p className="text-5xl font-bold text-gray-800">Grow your company with a modernized <span className="inline text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-indigo-300 to-indigo-700">rewards</span> system</p>
           <p className="text-2xl font-light text-gray-600">Get the most out of your customers and encourage them to come back using a modernized loyalty program all through text messaging.</p>
           <div className="flex flex-row items-center">
             <Link href="/auth/signup">
-              <a className="flex flex-row items-center gap-1 p-2 text-xl font-semibold text-white bg-red-500 rounded-lg shadow-sm hover:bg-red-600">
+              <a className="flex flex-row items-center gap-1 p-2 text-xl font-semibold text-white bg-indigo-500 rounded-lg shadow-sm hover:bg-indigo-600">
                 Get Started
               <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -224,21 +224,21 @@ const HelpSection = () => {
       </div>
       <div className="grid grid-cols-3 gap-4">
         <div className="flex flex-col items-center gap-1 p-4 bg-white rounded shadow hover:shadow-lg">
-          <svg xmlns="http://www.w3.org/2000/svg" className="p-2 text-white bg-red-400 rounded-full fill-current w-14 h-14" viewBox="0 0 20 20" fill="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" className="p-2 text-white bg-indigo-400 rounded-full fill-current w-14 h-14" viewBox="0 0 20 20" fill="currentColor">
             <path fillRule="evenodd" d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h3l3 3 3-3h3a2 2 0 002-2zM5 7a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1zm1 3a1 1 0 100 2h3a1 1 0 100-2H6z" clipRule="evenodd" />
           </svg>
           <p className="text-2xl font-semibold text-center text-gray-700">Engage Your Customers</p>
           <p className="px-2 text-lg text-center text-gray-500">Through the power of text messages, you as a business have unlimited possibilities at hand. Discover the ways you can reward your customers for purchasing from you. Create rewards, discounts, promotions, and even target customers that you want to come back.</p>
         </div>
         <div className="flex flex-col items-center gap-1 p-4 bg-white rounded shadow hover:shadow-lg">
-          <svg xmlns="http://www.w3.org/2000/svg" className="p-2 text-white bg-red-400 rounded-full fill-current w-14 h-14" viewBox="0 0 20 20" fill="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" className="p-2 text-white bg-indigo-400 rounded-full fill-current w-14 h-14" viewBox="0 0 20 20" fill="currentColor">
             <path fillRule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 0l-2 2a1 1 0 101.414 1.414L8 10.414l1.293 1.293a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
           </svg>
           <p className="text-2xl font-semibold text-center text-gray-700">Drive Sales</p>
-          <p className="px-2 text-lg text-center text-gray-500">Promote your products and services to many with a single text message that can be viewed by many. Customers can send a picture of their receipt and receive points or visits that they can redeem in your business.</p>
+          <p className="px-2 text-lg text-center text-gray-500">Promote your products and services to many with a single text message that can be viewed by many. Customers can send a picture of their receipt and receive points or visits that they can indigoeem in your business.</p>
         </div>
         <div className="flex flex-col items-center gap-1 p-4 bg-white rounded shadow hover:shadow-lg">
-          <svg xmlns="http://www.w3.org/2000/svg" className="p-2 text-white bg-red-400 rounded-full fill-current w-14 h-14" viewBox="0 0 20 20" fill="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" className="p-2 text-white bg-indigo-400 rounded-full fill-current w-14 h-14" viewBox="0 0 20 20" fill="currentColor">
             <path fillRule="evenodd" d="M12 1.586l-4 4v12.828l4-4V1.586zM3.707 3.293A1 1 0 002 4v10a1 1 0 00.293.707L6 18.414V5.586L3.707 3.293zM17.707 5.293L14 1.586v12.828l2.293 2.293A1 1 0 0018 16V6a1 1 0 00-.293-.707z" clipRule="evenodd" />
           </svg>
           <p className="text-2xl font-semibold text-center text-gray-700">Increase Outreach</p>
@@ -251,11 +251,11 @@ const HelpSection = () => {
 
 const LastCTA = () => {
   return (
-    <div className="flex flex-col items-center gap-1 py-24 bg-red-500">
+    <div className="flex flex-col items-center gap-1 py-24 bg-indigo-700">
       <p className="text-4xl font-bold text-center text-white">Create Your First Promotion In Minutes</p>
       <p className="text-2xl font-light text-center text-gray-100">Get everything you need to encourage your customers to keep coming back to your business.</p>
       <Link href="/auth/signup">
-        <a type="button" className="px-4 py-2 mt-3 text-lg font-bold text-center text-red-500 uppercase bg-white rounded-lg">Create Account</a>
+        <a type="button" className="px-4 py-2 mt-3 text-lg font-bold text-center text-indigo-700 uppercase bg-white rounded-lg hover:text-indigo-800">Create Account</a>
       </Link>
     </div>
   )
@@ -377,4 +377,4 @@ const HomePage = () => {
 
 export default HomePage
 
-export { Navbar, Footer, LandingSection }
+export { Navbar, Footer }

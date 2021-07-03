@@ -50,15 +50,56 @@ const getPasswordIndicator = (pass) => {
     return (
         <>
         <div className="grid grid-cols-3 gap-2 mt-2">
-            <div className={strength == PasswordStrength.WEAK ? "border-t-4 border-red-500" : strength == PasswordStrength.MODERATE ? "border-t-4 border-yellow-500" : "border-t-4 border-green-500"} />
+            <div className={strength == PasswordStrength.WEAK ? "border-t-4 border-indigo-500" : strength == PasswordStrength.MODERATE ? "border-t-4 border-yellow-500" : "border-t-4 border-green-500"} />
             <div className={strength == PasswordStrength.WEAK ? "border-t-4 border-gray-200" : strength == PasswordStrength.MODERATE ? "border-t-4 border-yellow-500" : "border-t-4 border-green-500"} />
             <div className={strength == PasswordStrength.WEAK ? "border-t-4 border-gray-200" : strength == PasswordStrength.MODERATE ? "border-t-4 border-gray-200" : "border-t-4 border-green-500"} />
         </div>
         <div className="grid grid-cols-2">
-            <p className={strength == PasswordStrength.WEAK ? "font-medium text-red-500" : strength == PasswordStrength.MODERATE ? "font-medium text-yellow-500" : "font-medium text-green-500"}>{strength} Password</p>
+            <p className={strength == PasswordStrength.WEAK ? "font-medium text-indigo-500" : strength == PasswordStrength.MODERATE ? "font-medium text-yellow-500" : "font-medium text-green-500"}>{strength} Password</p>
         </div>
         </>
     )
+}
+
+const isNumericInput = (event) => {
+    const key = event.keyCode
+    return ((key >= 48 && key <= 57) || 
+        (key >= 96 && key <= 105)
+    )
+}
+
+const isModifierKey = (event) => {
+    const key = event.keyCode
+    return (event.shiftKey === true || key === 35 || key === 36) ||
+        (key === 8 || key === 9 || key === 13 || key === 46) || 
+        (key > 36 && key < 41) ||
+        (
+            (event.ctrlKey === true || event.metaKey === true) &&
+            (key === 65 || key === 67 || key === 86 || key === 88 || key === 90)
+        )
+}
+
+const enforceFormat = (event) => {
+    if(!isNumericInput(event) && !isModifierKey(event)){
+        event.preventDefault()
+    }
+}
+
+const formatToPhone = (event) => {
+    if(isModifierKey(event)) {return}
+
+    const input = event.target.value.replace(/\D/g,'').substring(0,10)
+    const areaCode = input.substring(0,3)
+    const middle = input.substring(3,6)
+    const last = input.substring(6,10)
+
+    if (input.length > 6) { event.target.value = `(${areaCode}) ${middle}-${last}` }
+    else if (input.length > 3) { event.target.value = `(${areaCode}) ${middle}` }
+    else if (input.length > 0) { event.target.value = `(${areaCode}` }
+}
+
+const getReadablePhone = (phoneNum: string) => {
+    return phoneNum.replaceAll(' ', '').replaceAll('(', '').replaceAll(')', '').replaceAll('-', '')
 }
 
 const SignUp = () => {
@@ -77,7 +118,7 @@ const SignUp = () => {
         try {
             var passStrength = checkPassStrength(password.value)
             if (passStrength == PasswordStrength.MODERATE || passStrength == PasswordStrength.WEAK) throw new Error('Your password is not strong enough.')
-            const user = await signUp({ first: first.value, last: last.value, email: email.value, password: password.value, phone: phone.value != undefined ? phone.value : "", birthday: birthday != undefined ? birthday.value : "" })
+            const user = await signUp({ first: first.value, last: last.value, email: email.value, password: password.value, phone: phone.value != undefined ? getReadablePhone(phone.value) : "", birthday: birthday != undefined ? birthday.value : "" })
             router.push('/manage')
         } catch (e) {
             setError(e.message)
@@ -95,19 +136,22 @@ const SignUp = () => {
                     <div className="flex flex-col">
                         <p className="text-3xl font-medium text-center text-gray-700">Create an account</p>
                         <p className="flex flex-row justify-center text-xl text-gray-500 gap-x-1">or
-                        <Link href="/auth/signin">
-                            <a className="font-medium text-red-500">
-                                sign in to one
-                            </a>
-                        </Link>
+                            <Link href="/auth/signin">
+                                <a className="flex flex-row items-center gap-1 font-medium text-indigo-500 hover:text-indigo-600">
+                                    sign in
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                                    </svg>
+                                </a>
+                            </Link>
                         </p>
                     </div>
                     <div className="flex flex-col gap-4 p-8 bg-white rounded shadow-sm">
                         { !error ? "" :
                         (
-                            <div className="flex flex-col p-3 bg-red-100 border-l-4 border-red-600">
-                                <p className="text-lg font-medium text-red-600">Error</p>
-                                <p className="text-red-600 text-md">{ error }</p>
+                            <div className="flex flex-col p-3 bg-indigo-100 border-l-4 border-indigo-600">
+                                <p className="text-lg font-medium text-indigo-600">Error</p>
+                                <p className="text-indigo-600 text-md">{ error }</p>
                             </div>
                         )}
                         <form onSubmit={handleSubmit} className="flex flex-col gap-y-4">
@@ -131,7 +175,7 @@ const SignUp = () => {
                             </div>
                             <div className="flex flex-col gap-1">
                                 <p className="flex flex-row items-center font-medium text-gray-600 gap-x-1">Phone number <span className="text-sm text-gray-500">(optional)</span></p>
-                                <input type="text" name="phone" className="border border-gray-300 rounded shadow-sm" placeholder="(999) 999-9999" />
+                                <input type="text" maxLength={16} onKeyDown={enforceFormat} onKeyUp={formatToPhone} name="phone" className="border border-gray-300 rounded shadow-sm" placeholder="(999) 999-9999" />
                             </div>
                             <div className="flex flex-col gap-1">
                                 <p className="font-medium text-gray-600">Password</p>
@@ -145,8 +189,8 @@ const SignUp = () => {
                                 </label>
                             </div>
                             <div className="flex flex-col mt-2">
-                                <button type="submit" className={ !loading ? "hover:outline-none p-2 text-lg font-medium text-white bg-red-500 rounded shadow-sm hover:bg-red-600 hover:shadow" :
-                                 "p-2 text-lg flex flex-row items-center hover:outline-none justify-center font-medium text-white cursor-not-allowed bg-red-400 rounded shadow-sm"}>
+                                <button type="submit" className={ !loading ? "hover:outline-none p-2 text-lg font-medium text-white bg-indigo-500 rounded shadow-sm hover:bg-indigo-600 hover:shadow" :
+                                 "p-2 text-lg flex flex-row items-center hover:outline-none justify-center font-medium text-white cursor-not-allowed bg-indigo-400 rounded shadow-sm"}>
                                      { !loading ? "Sign Up" :
                                      (
                                         <>

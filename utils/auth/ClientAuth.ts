@@ -20,6 +20,7 @@ const signUp = async (options: ISignUpOptions) => {
             birthday: options.birthday != undefined ? options.birthday : "",
             email: options.email,
             emailVerified: false,
+            phoneNum: !options.phone ? "" : options.phone,
             login: {
                 uid: user.user.uid
             },

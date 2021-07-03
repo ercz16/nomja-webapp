@@ -10,7 +10,7 @@ enum Time {
 }
 
 const PricingSection = () => {
-    const [time, setTime] = useState(Time.YEARLY)
+    const [time, setTime] = useState(Time.MONTHLY)
     const enabled = time == Time.YEARLY
 
     return (
@@ -51,6 +51,45 @@ const PricingSection = () => {
                                 <p className="flex px-2 py-1 font-medium text-white bg-green-500 rounded-lg text-md">Save 20%</p>
                             </div>
                        </div>
+                    </div>
+                </div>
+                <div className="container gap-4 py-8 mx-auto px-80">
+                    <div className="grid grid-cols-3 gap-4">
+                        <div className="relative z-20 flex flex-col flex-grow-0 p-2 mt-3 bg-white rounded-lg shadow-sm">
+                            hello world
+                        </div>
+                        <div className="relative z-20 flex flex-col flex-grow-0 -mt-5 -mb-3 bg-white rounded-lg shadow flex-nowrap">
+                            <div className="flex flex-col gap-3 p-4 border-b border-opacity-75">
+                                <p className="text-2xl font-medium text-center">Premium</p>
+                                <div className="flex flex-row items-center justify-center gap-1">
+                                    <div className="flex flex-row">
+                                        <p className="text-4xl font-medium">$</p>
+                                        <p className="text-5xl font-medium">{ time == Time.YEARLY ? 500 : 50}</p>
+                                    </div>
+                                    <p className="text-xl text-gray-500">/ { time == Time.YEARLY ? "year" : "month"}</p>
+                                </div>  
+                            </div>
+                            <div className="flex flex-col gap-1 p-4 bg-gray-100 bg-opacity-50 border-b border-opacity-75">
+                                <div className="flex flex-row items-center gap-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-green-500 fill-current" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                    </svg>
+                                    <p className="text-lg text-gray-500">Up to 100 active users</p>
+                                </div>
+                                <div className="flex flex-row items-center gap-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-green-500 fill-current" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                    </svg>
+                                    <p className="text-lg text-gray-500">$0.50 per extra user</p>
+                                </div>
+                                <div className="flex flex-row justify-center mt-4">
+                                    <a className="w-full px-2 py-1 text-lg font-medium text-center text-white bg-red-500 rounded-lg shadow hover:bg-red-600">Buy Now</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="relative z-20 flex-grow-0 p-2 mt-3 bg-white rounded-lg shadow-sm">
+                            hello world
+                        </div>
                     </div>
                 </div>
             </div>
