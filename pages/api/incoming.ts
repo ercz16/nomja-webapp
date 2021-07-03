@@ -2,8 +2,7 @@ import { firebaseAdmin } from '../../utils/firebase/FirebaseAdmin'
 import { search } from '../../utils/vision/Vision'
 import { nanoid } from 'nanoid'
 import axios from 'axios'
-import { PricingInterface } from 'plivo/dist/resources/pricings'
-import { METHODS } from 'http'
+import { withSentry } from '@sentry/nextjs'
 
 const sendMessage = async (from, to, text) => {
     const db = await firebaseAdmin.firestore().collection('messages')
@@ -196,7 +195,9 @@ const isProcessing = async (uuid) => {
 }
 
 const handler = async (req, res) => {
-    if (req.method != 'POST') return res.status(400).json({ errors: [{ message: 'Invalid request method' }]})
+    if (req.method != 'POST') {
+        return res.status(400).json({ errors: [{ message: 'Invalid request method' }]})
+    }
     
     const { From, To, Text, MediaCount, MessageUUID } = req.body
 
@@ -241,4 +242,4 @@ const handler = async (req, res) => {
     }
 }
 
-export default handler
+export default withSentry(handler)
