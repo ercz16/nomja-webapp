@@ -4,6 +4,8 @@ import Link from 'next/link'
 import Head from 'next/head'
 import QRCode from 'qrcode'
 
+import { useAuth } from '../../../utils/auth/AuthProvider'
+
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { getSSRPropsProgram } from '../../../utils/auth/ServerAuth'
@@ -24,11 +26,6 @@ const getPages = (props) => {
   }
 }
 
-export const getServerSideProps = async (ctx) => {
-  const props = await getSSRPropsProgram(ctx)
-  return props
-}
-
 const formatPhoneNumber = (phoneNumberString) => {
   var cleaned = ('' + phoneNumberString).replace(/\D/g, '')
   var match = cleaned.match(/^(1|)?(\d{3})(\d{3})(\d{4})$/)
@@ -39,7 +36,89 @@ const formatPhoneNumber = (phoneNumberString) => {
   return null
 }
 
+const Sidebar = (props) => {
+  const router = useRouter()
+  const { user, data, programs } = useAuth()
+  const program = !programs ? null : programs.filter(p => p.id == router.query.id)[0]
+  
+  return (
+    <div className="flex flex-col items-center flex-none w-56 min-h-screen py-4 bg-gray-100 bg-opacity-75 border-r">
+        { !program ? 
+          <div className="flex flex-col w-10/12 gap-1 px-2 py-1 mb-3 bg-gray-200 rounded-lg animate-pulse">
+            <div className="w-5/12 h-6 bg-gray-300 rounded" />
+            <div className="w-9/12 h-5 bg-gray-300 rounded" /> 
+            <div className="w-10/12 h-5 bg-gray-300 rounded" />
+          </div>
+        : 
+          <div className="flex flex-col w-10/12 px-2 py-1 mb-3 bg-gray-200 rounded-lg">
+            <p className="text-xl font-medium text-gray-700">{ program.name }</p>
+            <p className="text-lg text-gray-600">{ formatPhoneNumber(program.phoneNum) }</p>
+            <p className="text-lg text-gray-600">@{ program.uniqueCode }</p>
+          </div>
+        }
+        <div className="flex flex-row items-center w-full gap-3 p-2 px-4 text-gray-600 cursor-pointer hover:text-gray-500">
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 fill-current" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
+          </svg>
+          <span className="text-lg">Dashboard</span>
+        </div>
+        <div className="flex flex-row items-center w-full gap-3 p-2 px-4 text-gray-600 cursor-pointer hover:text-gray-500">
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 fill-current" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M5 2a2 2 0 00-2 2v14l3.5-2 3.5 2 3.5-2 3.5 2V4a2 2 0 00-2-2H5zm4.707 3.707a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L8.414 9H10a3 3 0 013 3v1a1 1 0 102 0v-1a5 5 0 00-5-5H8.414l1.293-1.293z" clipRule="evenodd" />
+          </svg>
+          <span className="text-lg">Rewards</span>
+        </div>
+        <div className="flex flex-row items-center w-full gap-3 p-2 px-4 text-gray-600 cursor-pointer hover:text-gray-500">
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 fill-current" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
+          </svg>
+          <span className="text-lg">Customers</span>
+        </div>
+        <div className="flex flex-row items-center w-full gap-3 p-2 px-4 text-gray-600 cursor-pointer hover:text-gray-500">
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 fill-current" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
+          </svg>
+          <span className="text-lg">Settings</span>
+        </div>
+    </div>
+  )
+}
+
+const Navbar = (props) => {
+  const router = useRouter()
+  const { user, programs, data } = useAuth()
+  const program = !programs ? null : programs.filter(p => p.id == router.query.id)
+
+  return (
+    <div className="flex flex-row items-center justify-between w-full h-16 px-8 border-b">
+      <div className="flex flex-row items-center gap-4">
+        <Link href='/manage'>
+          <a className="text-4xl font-extrabold text-indigo-500 hover:text-indigo-600">nomja</a>
+        </Link>
+        
+      </div>
+      <div className="flex flex-row items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" className={`p-1 text-gray-600 bg-gray-100 rounded-full fill-current w-7 h-7 bg-opacity-500 ${!data ? 'animate-pulse' : ''}`} viewBox="0 0 20 20" fill="currentColor">
+          <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+        </svg>
+        {!data ? <div className="w-24 h-4 bg-gray-100 rounded-lg animate-pulse" /> :
+          <p className="text-lg text-gray-600">{ data.name.first + ' ' + data.name.last }</p>
+        }
+      </div>
+    </div>
+  )
+}
+
 const Index = (props) => {
+  return (
+    <div className="flex flex-row">
+      <Sidebar props={props} />
+      <Navbar />
+    </div>
+  )
+}
+
+const Indexf = (props) => {
   const router = useRouter()
   const { program, user, customers } = props
   const Pages = getPages(props)
@@ -52,18 +131,16 @@ const Index = (props) => {
         <title>{program.name} - Nomja</title>
       </Head>
       <div className="h-screen bg-gray-100">
-        <div className="flex justify-between items-center px-8 py-4 bg-gray-100">
+        <div className="flex items-center justify-between px-8 py-4 bg-gray-100">
           <div className="p-1">
-            <Link href="/manage">
-              <a>
-                <img src="/all-together.png" className="h-9" />
-              </a>
+            <Link href='/manage'>
+              <a className="text-3xl font-bold text-indigo-500 hover:text-indigo-600">nomja</a>
             </Link>
           </div>
           <div className="flex flex-col">
             <div
               onClick={() => setAccountDropdownOpen(true)}
-              className="flex justify-between items-center cursor-pointer gap-x-2"
+              className="flex items-center justify-between cursor-pointer gap-x-2"
             >
               <p className="text-lg font-medium">
                 {user.name.first + ' ' + user.name.last}
@@ -115,19 +192,19 @@ const Index = (props) => {
           </div>
         </div>
         <div className="flex">
-          <div className="h-screen bg-white shadow border-none">
-            <div className="flex flex-col justify-start p-5 gap-y-6 bg-gray-100 h-full">
-              <div className="flex flex-col px-6 pb-4 pt-2 bg-white shadow-xl rounded-md">
-                <p className="text-xl font-medium text-gray-800 border-b-2 border-gray-300 text-center">
+          <div className="h-screen bg-white border-none shadow">
+            <div className="flex flex-col justify-start h-full p-5 bg-gray-100 gap-y-6">
+              <div className="flex flex-col px-6 pt-2 pb-4 bg-white rounded-md shadow-xl">
+                <p className="text-xl font-medium text-center text-gray-800 border-b-2 border-gray-300">
                   {program.name}
                 </p>
-                <p className="text-lg text-gray-500 text-center">
+                <p className="text-lg text-center text-gray-500">
                   {program.description}
                 </p>
-                <p className="text-gray-500 text-md text-center mt-2">
+                <p className="mt-2 text-center text-gray-500 text-md">
                   {formatPhoneNumber(program.phoneNum)}
                 </p>
-                <p className="text-gray-500 text-md ml-3">
+                <p className="ml-3 text-gray-500 text-md">
                   @{program.uniqueCode}
                 </p>
                 <a

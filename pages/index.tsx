@@ -8,7 +8,7 @@ const Navbar = (props) => {
   return (
     <div className="relative z-10 flex flex-row items-center justify-between p-4 px-32 bg-white shadow-sm">
       <Link href='/'>
-        <a className="text-6xl font-extrabold text-indigo-500 hover:text-indigo-600">nomja</a>
+        <a className="text-5xl font-extrabold text-indigo-500 hover:text-indigo-600">nomja</a>
       </Link>
       <div className="flex flex-row items-center gap-4">
         <Link href="/features">

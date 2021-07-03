@@ -7,6 +7,8 @@ import { useRouter } from 'next/router'
 import { getSSRPropsUser } from '../utils/auth/ServerAuth'
 import { Dialog, Transition } from '@headlessui/react'
 
+import { useAuth } from '../utils/auth/AuthProvider'
+
 import CreateProgramModal from '../components/modals/CreateProgramModal'
 import CreateButton from '../components/buttons/CreateButton'
 
@@ -21,7 +23,7 @@ export const getServerSideProps = async (ctx) => {
 }
 
 const Manage = (props) => {
-  const { user, programs } = props
+  const { user, data, programs } = useAuth()
   const [createOpen, setCreateOpen] = useState(false)
 
   const openCreate = () => {
@@ -38,7 +40,7 @@ const Manage = (props) => {
         <title>Manage - Nomja</title>
       </Head>
       <div className="flex flex-row p-4 border-b">
-        <div className="px-36">
+        <div className="px-32">
           <Link href='/'>
             <a className="text-5xl font-bold text-indigo-500 hover:text-indigo-600">nomja</a>
           </Link>
@@ -57,8 +59,8 @@ const Manage = (props) => {
             open={() => setCreateOpen(true)}
             close={() => setCreateOpen(false)}
           />
-          <div className="grid grid-cols-4 gap-10 px-24 mt-7 place-items-stretch">
-            {programs.length == 0 ? (
+          <div className="grid grid-cols-6 gap-4 px-24 mt-7 place-items-stretch">
+            { !programs ? <ProgramsLoading /> : programs && programs.length == 0 ? (
               <NoPrograms open={() => openCreate()} />
             ) : (
               programs.map((program) => {
@@ -73,26 +75,82 @@ const Manage = (props) => {
   )
 }
 
+const ProgramsLoading = () => {
+  return (
+    <>
+    <div className="flex flex-col gap-1 p-2 bg-white border border-gray-100 rounded-lg shadow-sm animate-pulse">
+      <div className="w-1/2 h-1 h-4 bg-gray-200 rounded" />
+      <div className="w-4/6 h-1 h-4 bg-gray-200 rounded" />
+      <div className="h-1 h-4 bg-gray-200 rounded" />
+      <div className="h-1 h-4 bg-gray-200 rounded" />
+      <div className="h-1 h-4 bg-gray-200 rounded" />
+    </div>
+    <div className="flex flex-col gap-1 p-2 bg-white border border-gray-100 rounded-lg shadow-sm animate-pulse">
+      <div className="w-1/2 h-1 h-4 bg-gray-200 rounded" />
+      <div className="w-4/6 h-1 h-4 bg-gray-200 rounded" />
+      <div className="h-1 h-4 bg-gray-200 rounded" />
+      <div className="h-1 h-4 bg-gray-200 rounded" />
+      <div className="h-1 h-4 bg-gray-200 rounded" />
+    </div>
+    <div className="flex flex-col gap-1 p-2 bg-white border border-gray-100 rounded-lg shadow-sm animate-pulse">
+      <div className="w-1/2 h-1 h-4 bg-gray-200 rounded" />
+      <div className="w-4/6 h-1 h-4 bg-gray-200 rounded" />
+      <div className="h-1 h-4 bg-gray-200 rounded" />
+      <div className="h-1 h-4 bg-gray-200 rounded" />
+      <div className="h-1 h-4 bg-gray-200 rounded" />
+    </div>
+    <div className="flex flex-col gap-1 p-2 bg-white border border-gray-100 rounded-lg shadow-sm animate-pulse">
+      <div className="w-1/2 h-1 h-4 bg-gray-200 rounded" />
+      <div className="w-4/6 h-1 h-4 bg-gray-200 rounded" />
+      <div className="h-1 h-4 bg-gray-200 rounded" />
+      <div className="h-1 h-4 bg-gray-200 rounded" />
+      <div className="h-1 h-4 bg-gray-200 rounded" />
+    </div>
+    <div className="flex flex-col gap-1 p-2 bg-white border border-gray-100 rounded-lg shadow-sm animate-pulse">
+      <div className="w-1/2 h-1 h-4 bg-gray-200 rounded" />
+      <div className="w-4/6 h-1 h-4 bg-gray-200 rounded" />
+      <div className="h-1 h-4 bg-gray-200 rounded" />
+      <div className="h-1 h-4 bg-gray-200 rounded" />
+      <div className="h-1 h-4 bg-gray-200 rounded" />
+    </div>
+    <div className="flex flex-col gap-1 p-2 bg-white border border-gray-100 rounded-lg shadow-sm animate-pulse">
+      <div className="w-1/2 h-1 h-4 bg-gray-200 rounded" />
+      <div className="w-4/6 h-1 h-4 bg-gray-200 rounded" />
+      <div className="h-1 h-4 bg-gray-200 rounded" />
+      <div className="h-1 h-4 bg-gray-200 rounded" />
+      <div className="h-1 h-4 bg-gray-200 rounded" />
+    </div>
+    <div className="flex flex-col gap-1 p-2 bg-white border border-gray-100 rounded-lg shadow-sm animate-pulse">
+      <div className="w-1/2 h-1 h-4 bg-gray-200 rounded" />
+      <div className="w-4/6 h-1 h-4 bg-gray-200 rounded" />
+      <div className="h-1 h-4 bg-gray-200 rounded" />
+      <div className="h-1 h-4 bg-gray-200 rounded" />
+      <div className="h-1 h-4 bg-gray-200 rounded" />
+    </div>
+    </>
+  )
+}
+
 const NoPrograms = (props) => {
   const { open } = props
   return (
     <>
       <div
-        className="absolute flex flex-col items-center text-gray-800 top-2/4 left-2/4"
+        className="absolute flex flex-col items-center gap-2 p-4 text-gray-600 top-2/4 left-2/4"
         style={{ transform: 'translate(-50%, -50%)' }}
       >
-        <p className="text-xl text-medium">
+        <svg xmlns="http://www.w3.org/2000/svg" className="w-16 h-16 text-gray-600 fill-current" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM14 11a1 1 0 011 1v1h1a1 1 0 110 2h-1v1a1 1 0 11-2 0v-1h-1a1 1 0 110-2h1v-1a1 1 0 011-1z" />
+        </svg>
+        <p className="text-2xl font-semibold text-gray-800">
           It appears you haven't created a program
         </p>
-        <p className="text-lg">
-          <a
+        <a
             onClick={() => open()}
-            className="font-medium text-red-500 cursor-pointer hover:text-red-600 hover:underline"
+            className="px-2 py-1 text-lg font-medium text-white bg-indigo-500 rounded-lg shadow-sm cursor-pointer hover:bg-indigo-600 focus:outline-none"
           >
-            Click here
-          </a>{' '}
-          to create one
-        </p>
+            Create One
+        </a>
       </div>
     </>
   )
