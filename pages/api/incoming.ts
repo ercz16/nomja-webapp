@@ -203,7 +203,7 @@ const handler = async (req, res) => {
     var hasMedia = MediaCount
     if (!hasMedia) {
         const toSend = await handleText(Text, To, From)
-        const sent = await sendMessage({ to: To, from: From, body: toSend })
+        const sent = await sendMessage({ to: From, from: To, body: toSend })
         return res.status(200).json(sent)
     } else {
         const url = req.body.Media0
@@ -223,11 +223,11 @@ const handler = async (req, res) => {
             const [date, amount] = await search(base64response)
             const customerPoints = await firebaseAdmin.firestore().collection('customers').doc(From).update({ rewards: firebaseAdmin.firestore.FieldValue.arrayUnion({ type: 'POINTS', purchaseDate: date.toString(), amount: Math.floor(amount), phoneNum: To, date: new Date().toString() })})
             const customerVisit = await firebaseAdmin.firestore().collection('customers').doc(From).update({ rewards: firebaseAdmin.firestore.FieldValue.arrayUnion({ type: 'VISIT', purchaseDate: date.toString(), amount: 1, phoneNum: To, date: new Date().toString() })})
-            const sent = await sendMessage({ to: To, from: From, body: `Successfully redeemed your receipt for ${Math.floor(amount)} points and 1 visit!` })
+            const sent = await sendMessage({ to: From, from: To, body: `Successfully redeemed your receipt for ${Math.floor(amount)} points and 1 visit!` })
             return res.status(200).json(sent)
         } catch (e) {
             console.log(e)
-            const sent = await sendMessage({ to: To, from: From, body: 'Something went wrong. Please make sure you have your receipt in the image.' })
+            const sent = await sendMessage({ to: From, from: To, body: 'Something went wrong. Please make sure you have your receipt in the image.' })
             return res.status(200).json(sent)
         }
     }
