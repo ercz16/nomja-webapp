@@ -65,7 +65,7 @@ const Manage = (props) => {
             ) : (
               programs.map((program) => {
                 return (
-                  <ProgramCard key={program.id} program={program} user={user} />
+                  <ProgramCard key={program.id} program={program} user={data} />
                 )
               })
             )}
