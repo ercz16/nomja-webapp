@@ -6,6 +6,18 @@ interface IAssignResponse {
     phoneNum: string
 }
 
+interface IMessageOptions {
+    from: string,
+    to: string,
+    body: string
+}
+
+const sendMessage = async (options: IMessageOptions) => {
+    const { from, to, body } = options
+    const response = await client.messages.create(from, to, body)
+    return response
+}
+
 const assign = async (programId: string): Promise<IAssignResponse> => {
     const numberToGet = await nextAvailable()
     const purchase = await client.numbers.buy(numberToGet.id, '89146420176655219')
@@ -21,4 +33,4 @@ const nextAvailable = async () => {
     return first
 }
 
-export { client, nextAvailable, assign }
+export { client, nextAvailable, assign, sendMessage }
