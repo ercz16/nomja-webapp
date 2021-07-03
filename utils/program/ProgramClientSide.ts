@@ -1,4 +1,5 @@
 import { nanoid } from 'nanoid'
+import { v4 as genUuid } from 'uuid'
 import QRCode from 'qrcode'
 import firebase from '../firebase/Firebase'
 const firestore = firebase.firestore,
@@ -15,7 +16,7 @@ var assignPhoneNumber = functions().httpsCallable('assignPhoneNumber')
 var deleteProgramFunc = functions().httpsCallable('deleteProgram')
 
 const createClientProgram = async (user, options: IProgramOptions) => {
-  const programId = nanoid(16)
+  const programId = genUuid()
   const phoneNum = await assignPhoneNumber({ user: user, programId: programId })
 
   const qrcode = await QRCode.toDataURL(

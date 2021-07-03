@@ -7,6 +7,7 @@ import RewardTypeOptions, { RewardType } from '../rewards/RewardTypeOptions'
 import { createReward } from '../../utils/program/rewards/Reward'
 
 import { nanoid } from 'nanoid'
+import { v4 as genUuid } from 'uuid'
 
 const CreateRewardModal = (props) => {
   const { user, program, isOpen, openCreate, closeCreate } = props
@@ -24,7 +25,7 @@ const CreateRewardModal = (props) => {
 
     try {
       const reward = await createReward(user.login.uid, program.id, {
-        id: nanoid(16),
+        id: genUuid(),
         name: name.value,
         description: description.value != undefined ? description.value : '',
         attributes: {
