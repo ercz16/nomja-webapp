@@ -71,6 +71,9 @@ const executeCommand = async (text: string, to: string, from: string) => {
             } else {
                 const first = program.docs[0].data()
                 const programToRemove = first.users.filter(user => user.phoneNum == from)[0]
+                if (!programToRemove || programToRemove.length == 0) {
+                    return `You are not currently subscribed to @${first.uniqueCode}`
+                }
                 const update = await firebaseAdmin.firestore().collection('programs').doc(first.id).update({ users: 
                 firebaseAdmin.firestore.FieldValue.arrayRemove(first.users.filter(user => user.phoneNum == from)[0])})
                 const customerUpdate = await firebaseAdmin.firestore().collection('customers').doc(from).update({ programs: 
