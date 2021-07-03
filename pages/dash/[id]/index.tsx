@@ -8,10 +8,15 @@ import { useAuth } from '../../../utils/auth/AuthProvider'
 
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { getSSRPropsProgram } from '../../../utils/auth/ServerAuth'
+import { getSSRPropsUser } from '../../../utils/auth/ServerAuth'
 import firebase from '../../../utils/firebase/Firebase'
 const firestore = firebase.firestore,
   auth = firebase.auth
+
+export const getServerSideProps = async (ctx) => {
+  const props = await getSSRPropsUser(ctx)
+  return props
+}
 
 const getPages = (props) => {
   const { program, user, customers } = props

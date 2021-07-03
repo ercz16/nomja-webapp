@@ -22,7 +22,13 @@ const getSSRAuth = async (ctx) => {
     return data
   } catch (e) {
     console.error(e)
-    return {}
+    return {
+      redirect: {
+        permanent: false,
+        destination: '/auth/signin',
+      },
+      props: {} as never,
+    }
   }
 }
 
