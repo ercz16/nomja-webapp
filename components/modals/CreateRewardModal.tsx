@@ -19,7 +19,7 @@ const CreateRewardModal = (props) => {
   const handleCreate = async (e) => {
     e.preventDefault()
 
-    const { name, description, requiindigo, activeUntil, discountPercentage } =
+    const { name, description, required, activeUntil, discountPercentage } =
       e.target
 
     try {
@@ -29,7 +29,7 @@ const CreateRewardModal = (props) => {
         description: description.value != undefined ? description.value : '',
         attributes: {
           type: type,
-          requiindigo: requiindigo.value != undefined ? requiindigo.value : '',
+          required: required.value != undefined ? required.value : '',
           activeUntil:
             activeUntil.value != undefined
               ? activeUntil.value

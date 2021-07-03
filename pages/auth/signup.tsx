@@ -50,7 +50,7 @@ const getPasswordIndicator = (pass) => {
     return (
         <>
         <div className="grid grid-cols-3 gap-2 mt-2">
-            <div className={strength == PasswordStrength.WEAK ? "border-t-4 border-indigo-500" : strength == PasswordStrength.MODERATE ? "border-t-4 border-yellow-500" : "border-t-4 border-green-500"} />
+            <div className={strength == PasswordStrength.WEAK ? "border-t-4 border-red-500" : strength == PasswordStrength.MODERATE ? "border-t-4 border-yellow-500" : "border-t-4 border-green-500"} />
             <div className={strength == PasswordStrength.WEAK ? "border-t-4 border-gray-200" : strength == PasswordStrength.MODERATE ? "border-t-4 border-yellow-500" : "border-t-4 border-green-500"} />
             <div className={strength == PasswordStrength.WEAK ? "border-t-4 border-gray-200" : strength == PasswordStrength.MODERATE ? "border-t-4 border-gray-200" : "border-t-4 border-green-500"} />
         </div>
