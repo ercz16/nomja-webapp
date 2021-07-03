@@ -37,7 +37,7 @@ const CreateProgramModal = (props) => {
         description: description.value,
         uniqueCode: uniqueCode.value,
       })
-      router.push('/dash/' + program.id)
+      router.push('/programs/' + program.id)
     } catch (e) {
       console.error(e)
       setError(e.message)

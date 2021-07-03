@@ -289,7 +289,7 @@ const ProgramCard = (props) => {
               {program.rewards.length} rewards
             </p>
           </div>
-          <Link href={'/dash/' + program.id}>
+          <Link href={'/programs/' + program.id}>
             <a className="flex flex-row items-center justify-center px-2 py-1 font-medium text-white bg-indigo-500 rounded shadow-sm hover:bg-indigo-600">
               Dashboard
               <svg
