@@ -18,7 +18,7 @@ export function AuthProvider({ children }) {
             if (!user) {
                 setUser(null)
                 nookies.destroy(null, "token")
-                nookies.set(null, "token", "", {path: '/'})
+                nookies.set(null, "token", "", { path: '/' })
             } else {
                 const token = await user.getIdToken()
                 const userDoc = await firestore().collection('users').doc(user.uid).get()
