@@ -15,8 +15,6 @@ import {
   deleteProgram,
 } from '../utils/program/ProgramClientSide'
 
-import { format } from 'path'
-
 export const getServerSideProps = async (ctx) => {
   const props = await getSSRPropsUser(ctx)
   return props
@@ -39,13 +37,16 @@ const Manage = (props) => {
       <Head>
         <title>Manage - Nomja</title>
       </Head>
-      <div className="min-h-screen bg-gray-100">
-        <div className="pl-20 flex p-4">
-          <img src="/all-together.png" className="h-10" />
+      <div className="flex flex-row p-4 border-b">
+        <div className="px-36">
+          <Link href='/'>
+            <a className="text-5xl font-bold text-indigo-500 hover:text-indigo-600">nomja</a>
+          </Link>
         </div>
-        <div className="flex flex-col h-screen gap-2 px-5 py-5">
-          <div className="flex flex-row justify-between items-center w-11/12 px-2 pb-5 mx-auto border-b-2">
-            <p className="text-2xl font-medium">Manage Programs</p>
+      </div>
+      <div className="flex flex-col min-h-screen gap-2 px-5 py-5 bg-gray-100">
+          <div className="flex flex-row items-center justify-between w-11/12 px-2 pb-5 mx-auto border-b-2 border-gray-300">
+            <p className="text-2xl font-medium text-gray-800">Manage Programs</p>
             <CreateButton action={() => setCreateOpen(!createOpen)}>
               Create New
             </CreateButton>
@@ -56,7 +57,7 @@ const Manage = (props) => {
             open={() => setCreateOpen(true)}
             close={() => setCreateOpen(false)}
           />
-          <div className="mt-7 grid grid-cols-4 place-items-stretch gap-10 mx-12">
+          <div className="grid grid-cols-4 gap-10 px-24 mt-7 place-items-stretch">
             {programs.length == 0 ? (
               <NoPrograms open={() => openCreate()} />
             ) : (
@@ -67,7 +68,6 @@ const Manage = (props) => {
               })
             )}
           </div>
-        </div>
       </div>
     </>
   )
@@ -131,10 +131,10 @@ const ProgramCard = (props) => {
     <>
       <div
         key={program.id}
-        className="flex flex-col space-y-4 px-10 pt-6 pb-10 bg-white rounded-md shadow-lg"
+        className="flex flex-col p-4 space-y-2 bg-white rounded shadow w-max"
       >
-        <div className="relative flex justify-between items-center">
-          <p className="col-span-2 gap-1 text-xl font-medium">{program.name}</p>
+        <div className="relative flex items-center justify-between">
+          <p className="col-span-2 gap-1 text-xl font-medium">{program.name.substr(0, 24)}</p>
           <div
             className={
               !optionsOpen
@@ -232,7 +232,7 @@ const ProgramCard = (props) => {
             </p>
           </div>
           <Link href={'/dash/' + program.id}>
-            <a className="flex flex-row items-center px-2 py-1 font-medium text-white bg-red-500 rounded shadow-sm hover:bg-red-600">
+            <a className="flex flex-row items-center justify-center px-2 py-1 font-medium text-white bg-indigo-500 rounded shadow-sm hover:bg-indigo-600">
               Dashboard
               <svg
                 xmlns="http://www.w3.org/2000/svg"

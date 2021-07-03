@@ -11,7 +11,7 @@ const analytics = firebase.analytics
 
 const progress = new ProgressBar({
   size: 2,
-  color: "#EF4444",
+  color: "#8B5CF6",
   className: "z-50",
   delay: 100,
 })

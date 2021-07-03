@@ -78,8 +78,8 @@ const BaseModal = (props) => {
                       onClick={closeCreate}
                       className={
                         !loading
-                          ? 'px-4 py-2 font-medium text-gray-500 border border-gray-500 rounded cursor-pointer hover:bg-gray-500 hover:text-white text-md focus:outline-none'
-                          : 'px-4 py-2 font-medium text-gray-400 border border-gray-400 rounded cursor-pointer text-md focus:outline-none cursor-not-allowed'
+                          ? 'px-4 py-2 font-medium text-gray-700 border border-gray-700 rounded cursor-pointer text-md hover:text-white hover:bg-gray-700 focus:outline-none'
+                          : 'px-4 py-2 font-medium text-gray-500 border border-gray-600 rounded cursor-pointer text-md focus:outline-none cursor-not-allowed'
                       }
                     >
                       Cancel
@@ -88,8 +88,8 @@ const BaseModal = (props) => {
                       onClick={(e) => submitButton(e)}
                       className={
                         !loading
-                          ? 'flex flex-row items-center gap-1 px-4 py-2 font-medium text-white bg-red-500 rounded cursor-pointer hover:bg-red-600 text-md focus:outline-none'
-                          : 'flex flex-row items-center gap-1 px-4 py-2 font-medium text-white bg-red-400 rounded cursor-not-allowed text-md focus:outline-none'
+                          ? 'flex flex-row items-center gap-1 px-4 py-2 font-medium text-white bg-indigo-500 rounded cursor-pointer hover:bg-indigo-600 text-md focus:outline-none'
+                          : 'flex flex-row items-center gap-1 px-4 py-2 font-medium text-white bg-indigo-400 rounded cursor-not-allowed text-md focus:outline-none'
                       }
                     >
                       {loading ? (

@@ -186,9 +186,28 @@ const handleText = async (text: string, to: string, from: string) => {
     }
 }
 
+const process = async (uuid) => {
+    const doc = await firebaseAdmin.firestore().collection('queuedMessages').doc(uuid).set({ start: new Date().toISOString() })
+}
+
+const isProcessing = async (uuid) => {
+    const doc = await firebaseAdmin.firestore().collection('queuedMessages').doc(uuid).get()
+    return doc.exists
+}
+
 const handler = async (req, res) => {
     if (req.method != 'POST') return res.status(400).json({ errors: [{ message: 'Invalid request method' }]})
-    const { From, To, Text, MediaCount } = req.body
+    
+    const { From, To, Text, MediaCount, MessageUUID } = req.body
+
+    const beingProcssed = await isProcessing(MessageUUID)
+
+    if (beingProcssed) {
+        return res.status(400).json({ errors: [{ message: 'Currently processing this message.' }]})
+    } else {
+        process(MessageUUID)
+    }
+
     var hasMedia = MediaCount
     if (!hasMedia) {
         const toSend = await handleText(Text, To, From)

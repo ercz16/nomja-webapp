@@ -48,7 +48,7 @@ const CreateProgramModal = (props) => {
         dialogTitle="Create a Program"
         dialogSubTitle="Fill ou the form below to create a new program"
       >
-        <form onSubmit={handleCreate} className="flex flex-col space-y-5 py-4">
+        <form onSubmit={handleCreate} className="flex flex-col py-4 space-y-5">
           <div className="flex flex-col ">
             <p className="text-left">Name</p>
             <input
