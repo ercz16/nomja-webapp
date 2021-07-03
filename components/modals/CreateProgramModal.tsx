@@ -1,6 +1,8 @@
 import { useState, useRef, Fragment } from 'react'
 import { useRouter } from 'next/router'
 
+import { v4 as getUuid } from 'uuid'
+
 import BaseModal from './BaseModal'
 import { Dialog, Transition } from '@headlessui/react'
 
@@ -10,6 +12,7 @@ import {
   createClientProgram,
   deleteProgram,
 } from '../../utils/program/ProgramClientSide'
+import {nanoid} from "nanoid";
 
 const CreateProgramModal = (props) => {
   const { user, isOpen, open, close } = props
@@ -36,6 +39,7 @@ const CreateProgramModal = (props) => {
       })
       router.push('/dash/' + program.id)
     } catch (e) {
+      console.error(e)
       setError(e.message)
       setLoading(false)
     }
@@ -50,12 +54,9 @@ const CreateProgramModal = (props) => {
     setUniqueCodeLoading(true)
 
     const docs = await firebase.firestore().collection('programs').where('uniqueCode', '==', value).get()
+    const size = docs.docs.length
 
-    if (docs.docs.length >= 1) {
-      setValidUniqueCode(false)
-    } else {
-      setValidUniqueCode(true)
-    }
+    setValidUniqueCode(size == 0)
 
     setUniqueCodeLoading(false)
   }

@@ -1,7 +1,8 @@
 import { nanoid } from 'nanoid'
-import { v4 as genUuid } from 'uuid'
 import QRCode from 'qrcode'
 import firebase from '../firebase/Firebase'
+import { v4 as genUuid } from 'uuid'
+
 const firestore = firebase.firestore,
   auth = firebase.auth,
   functions = firebase.functions
@@ -17,11 +18,22 @@ var deleteProgramFunc = functions().httpsCallable('deleteProgram')
 
 const createClientProgram = async (user, options: IProgramOptions) => {
   const programId = genUuid()
-  const phoneNum = await assignPhoneNumber({ user: user, programId: programId })
+  const userDoc = await firestore().collection('users').doc(user.login.uid).get()
+
+  //  const programId = nanoid(32).replaceAll(/[^a-zA-Z\d\s:\u00C0-\u00FF]/g
+  //   , '')
+
+  const res = await fetch('/api/user/assignPhoneNumber',
+      {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ apiKey: userDoc.data().apiKeys[0], programId: programId})
+      })
+  const json = await res.json()
 
   const qrcode = await QRCode.toDataURL(
     `SMSTO:${
-      phoneNum.data.phoneNum.phoneNum
+        json.phoneNum
     }:@${options.uniqueCode.toLowerCase()}`,
     { scale: 25 }
   )
@@ -31,14 +43,12 @@ const createClientProgram = async (user, options: IProgramOptions) => {
     description: !options.description ? '' : options.description,
     name: options.name,
     id: programId,
-    rewards: new Array(),
-    users: new Array(),
+    rewards: [],
+    users: [],
     uniqueCode: options.uniqueCode.toLowerCase(),
-    phoneNum: phoneNum.data.phoneNum.phoneNum,
+    phoneNum: json.phoneNum,
     qrcode: qrcode,
   }
-
-  console.log(schema)
 
   const userUpdate = await firestore()
     .collection('users')
@@ -48,6 +58,7 @@ const createClientProgram = async (user, options: IProgramOptions) => {
     .collection('programs')
     .doc(schema.id)
     .set(schema)
+
   return schema
 }
 
@@ -88,7 +99,7 @@ const deleteProgram = async (uid, programId) => {
         ),
       })
   }
-  deleteProgramFunc({ program: snapshot.data() })
+  const func = await deleteProgramFunc({ program: snapshot.data() })
   const deletion = await db.doc(programId).delete()
 }
 
