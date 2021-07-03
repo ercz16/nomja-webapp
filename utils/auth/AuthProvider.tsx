@@ -23,15 +23,17 @@ export function AuthProvider({ children }) {
                 const token = await user.getIdToken()
                 const userDoc = await firestore().collection('users').doc(user.uid).get()
                 const programs = new Array()
-                for (const program of userDoc.data().programs) {
-                    const programDoc = await firestore().collection('programs').doc(program.id).get()
-                    programs.push(programDoc.data())
+                if (userDoc.exists) {
+                    for (const program of userDoc.data().programs) {
+                        const programDoc = await firestore().collection('programs').doc(program.id).get()
+                        programs.push(programDoc.data())
+                    }
                 }
                 setUser(user)
-                setData(userDoc.data())
+                setData(userDoc.exists ? userDoc.data() : null)
                 setPrograms(programs)
                 nookies.destroy(null, "token")
-                nookies.set(null, "token", token, {path: '/'})
+                nookies.set(null, "token", token, { path: '/' })
             }
         })
     }, [])
