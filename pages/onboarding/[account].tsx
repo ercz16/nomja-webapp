@@ -58,7 +58,7 @@ const NewAccount = (props) => {
         } catch (e) {
             setLoading(false)
         }
-        
+
     }
 
     return (
@@ -71,7 +71,7 @@ const NewAccount = (props) => {
                     </svg>
                     <div className="flex flex-col items-center">
                         <p className="text-gray-600 font-medium text-xl">Hello { user.name.first },</p>
-                        <p className="text-gray-500 text-md">Please click on the link in the email sent to you to verify your email address.</p>
+                        <p className="text-gray-500 text-md">Please click on the link in the email sent to <span className="font-bold">{ user.email }</span> to verify your email address.</p>
                     </div>
                     <div className="flex flex-col items-center gap-1 mt-5">
                         <p className="text-md text-gray-500">Have received an email?</p>
