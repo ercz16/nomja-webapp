@@ -61,30 +61,38 @@ const Sidebar = (props) => {
             <p className="text-lg text-gray-600">@{ program.uniqueCode }</p>
           </div>
         }
-        <div className="flex flex-row items-center w-full gap-3 p-2 px-4 text-gray-600 cursor-pointer hover:text-gray-500">
+      <Link href={!program ? '' : '/programs/' + program.id}>
+        <a className="flex flex-row items-center w-full gap-3 p-2 px-4 text-gray-600 cursor-pointer hover:text-gray-500">
           <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 fill-current" viewBox="0 0 20 20" fill="currentColor">
             <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
           </svg>
           <span className="text-lg">Dashboard</span>
-        </div>
-        <div className="flex flex-row items-center w-full gap-3 p-2 px-4 text-gray-600 cursor-pointer hover:text-gray-500">
+        </a>
+      </Link>
+      <Link href={!program ? '' : '/programs/' + program.id + '/rewards'}>
+        <a className="flex flex-row items-center w-full gap-3 p-2 px-4 text-gray-600 cursor-pointer hover:text-gray-500">
           <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 fill-current" viewBox="0 0 20 20" fill="currentColor">
             <path fillRule="evenodd" d="M5 2a2 2 0 00-2 2v14l3.5-2 3.5 2 3.5-2 3.5 2V4a2 2 0 00-2-2H5zm4.707 3.707a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L8.414 9H10a3 3 0 013 3v1a1 1 0 102 0v-1a5 5 0 00-5-5H8.414l1.293-1.293z" clipRule="evenodd" />
           </svg>
           <span className="text-lg">Rewards</span>
-        </div>
-        <div className="flex flex-row items-center w-full gap-3 p-2 px-4 text-gray-600 cursor-pointer hover:text-gray-500">
+        </a>
+      </Link>
+      <Link href={!program ? '' : '/programs/' + program.id + '/customers'}>
+        <a className="flex flex-row items-center w-full gap-3 p-2 px-4 text-gray-600 cursor-pointer hover:text-gray-500">
           <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 fill-current" viewBox="0 0 20 20" fill="currentColor">
             <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
           </svg>
           <span className="text-lg">Customers</span>
-        </div>
-        <div className="flex flex-row items-center w-full gap-3 p-2 px-4 text-gray-600 cursor-pointer hover:text-gray-500">
+        </a>
+      </Link>
+      <Link href={!program ? '' : '/programs/' + program.id + '/settings'}>
+        <a className="flex flex-row items-center w-full gap-3 p-2 px-4 text-gray-600 cursor-pointer hover:text-gray-500">
           <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 fill-current" viewBox="0 0 20 20" fill="currentColor">
             <path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
           </svg>
           <span className="text-lg">Settings</span>
-        </div>
+        </a>
+      </Link>
     </div>
   )
 }
@@ -102,7 +110,7 @@ const Navbar = (props) => {
         </Link>
         
       </div>
-      <div className="flex flex-row items-center gap-2">
+      <div className="flex flex-row items-center gap-2 rounded-lg cursor-pointer border border-white hover:border-gray-200 px-2 py-1">
         <svg xmlns="http://www.w3.org/2000/svg" className={`p-1 text-gray-600 bg-gray-100 rounded-full fill-current w-7 h-7 bg-opacity-500 ${!data ? 'animate-pulse' : ''}`} viewBox="0 0 20 20" fill="currentColor">
           <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
         </svg>
@@ -297,3 +305,5 @@ const Indexf = (props) => {
 }
 
 export default Index
+
+export { Navbar, Sidebar }
