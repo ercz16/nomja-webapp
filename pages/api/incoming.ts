@@ -83,6 +83,15 @@ const executeCommand = async (text: string, to: string, from: string) => {
         case 'rewards':
             const snapshot = await firebaseAdmin.firestore().collection('customers').doc(from).get()
             const data = snapshot.data()
+
+            const programs = await firebaseAdmin.firestore().collection('programs').where('phoneNum', '==', to).get()
+            for (const program of programs.docs) {
+                const users = program.data().users.map(user => user.phoneNum).filter(user => user == from)
+                if (users.length == 0) {
+                    return `You are not currently subscribed to @${program.data().uniqueCode}`
+                }
+            }
+
             var totalPoints = 0, totalVisits = 0
             data.rewards.forEach(reward => {
                 if (reward.phoneNum == to) {
