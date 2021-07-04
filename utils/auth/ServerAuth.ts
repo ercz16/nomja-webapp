@@ -41,11 +41,21 @@ const getSSRPropsUser = async (ctx) => {
       const data = doc.data()
       programs.push({ id: data.id, name: data.name, users: data.users, rewards: data.rewards, phoneNum: data.phoneNum })
     }
-    return {
-      props: {
-        user: user,
-        programs: programs
-      },
+    if (!user.emailVerified) {
+      return {
+        redirect: {
+          permanent: false,
+          destination: '/onboarding/' + user.login.uid,
+        },
+        props: {} as never,
+      }
+    } else {
+      return {
+        props: {
+          user: user,
+          programs: programs
+        },
+      }
     }
   } catch (e) {
     return {

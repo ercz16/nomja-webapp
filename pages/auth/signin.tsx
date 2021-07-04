@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import Head from 'next/head'
+import firebase from '../../utils/firebase/Firebase'
 
 import { signIn } from '../../utils/auth/ClientAuth'
 import { getSSRAuth } from '../../utils/auth/ServerAuth'
@@ -19,7 +20,14 @@ const SignIn = () => {
 
         try {
             const user = await signIn(email.value, password.value)
-            router.push('/manage')
+            const doc = await firebase.firestore().collection('users').doc(user.user.uid).get()
+
+            if (!doc.data().emailVerified) {
+                router.push('/onboarding/' + user.user.uid)
+            } else {
+                router.push('/manage')
+            }
+
         } catch (e) {
             console.log(e)
             setLoading(false)

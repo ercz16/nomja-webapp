@@ -55,7 +55,7 @@ const getPasswordIndicator = (pass) => {
             <div className={strength == PasswordStrength.WEAK ? "border-t-4 border-gray-200" : strength == PasswordStrength.MODERATE ? "border-t-4 border-gray-200" : "border-t-4 border-green-500"} />
         </div>
         <div className="grid grid-cols-2">
-            <p className={strength == PasswordStrength.WEAK ? "font-medium text-indigo-500" : strength == PasswordStrength.MODERATE ? "font-medium text-yellow-500" : "font-medium text-green-500"}>{strength} Password</p>
+            <p className={strength == PasswordStrength.WEAK ? "font-medium text-red-500" : strength == PasswordStrength.MODERATE ? "font-medium text-yellow-500" : "font-medium text-green-500"}>{strength} Password</p>
         </div>
         </>
     )
@@ -119,7 +119,7 @@ const SignUp = () => {
             var passStrength = checkPassStrength(password.value)
             if (passStrength == PasswordStrength.MODERATE || passStrength == PasswordStrength.WEAK) throw new Error('Your password is not strong enough.')
             const user = await signUp({ first: first.value, last: last.value, email: email.value, password: password.value, phone: phone.value != undefined ? getReadablePhone(phone.value) : "", birthday: birthday != undefined ? birthday.value : "" })
-            router.push('/manage')
+            router.push('/onboarding/' + user.user.uid)
         } catch (e) {
             setError(e.message)
             setLoading(false)
@@ -149,9 +149,9 @@ const SignUp = () => {
                     <div className="flex flex-col gap-4 p-8 bg-white rounded shadow-sm">
                         { !error ? "" :
                         (
-                            <div className="flex flex-col p-3 bg-indigo-100 border-l-4 border-indigo-600">
-                                <p className="text-lg font-medium text-indigo-600">Error</p>
-                                <p className="text-indigo-600 text-md">{ error }</p>
+                            <div className="flex flex-col p-3 bg-red-100 border-l-4 border-red-600">
+                                <p className="text-lg font-medium text-red-500">Error</p>
+                                <p className="text-red-600 text-md">{ error }</p>
                             </div>
                         )}
                         <form onSubmit={handleSubmit} className="flex flex-col gap-y-4">

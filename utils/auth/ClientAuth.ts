@@ -37,7 +37,7 @@ const signUp = async (options: ISignUpOptions) => {
             ],
             metadata: []
         })
-        return doc
+        return user
     } else {
         throw new Error('User already exists')
     }
