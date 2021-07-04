@@ -25,14 +25,15 @@ jobs:
 
     - name: npm install, build, and test
       run: |
-        npm ci
-        npm run build
+        npm install
+        npm run build --if-present
+        npm run test --if-present
 
     - name: Run Azure webapp deploy action using publish profile credentials
       uses: azure/webapps-deploy@v2
       with:
         app-name: NomjaWebApp
         slot-name: Production
-        publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_4380DFA1333348E8BFB10611A1715DE8 }}
+        publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_C8B65840EB2E46699DC616C06CB9183D }}
         package: .
 
