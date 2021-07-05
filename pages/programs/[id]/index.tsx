@@ -122,11 +122,46 @@ const Navbar = (props) => {
   )
 }
 
+const Loading = () => (
+    <>
+      <div className="animate-pulse flex flex-col px-5 py-3">
+        filler
+      </div>
+    </>
+)
+
+const Analytics = (props) => {
+  const router = useRouter()
+  const { user, programs, data } = useAuth()
+  const program = !programs ? null : programs.filter(p => p.id == router.query.id)[0]
+  return (
+      <div className="h-screen">
+        <div className="p-4 border-b-2">Analytics</div>
+        <div>Total Customers: {program.users.length}</div>
+        <div>Active Customers: </div>
+        <div>New Customers</div>
+        <div>Daily/montly customers</div>
+        <div>Redeemed receipts in last day/month</div>
+        <div>Users Inactive: </div>
+        <div>Money gained from rewards</div>
+        <div>Average number of visits per monrth</div>
+        <div>Popular rewards</div>
+        <div>average ticket cost</div>
+        <div>Come back rate</div>
+        <div>Likelihood that a customer will return (returning/ 1 visit)</div>
+        <div>Most Active time of day:</div>
+      </div>
+  )
+}
+
 const Index = (props) => {
   return (
     <div className="flex flex-row">
       <Sidebar props={props} />
-      <Navbar />
+      <div className="flex flex-col w-full">
+        <Navbar />
+        <Analytics />
+      </div>
     </div>
   )
 }
