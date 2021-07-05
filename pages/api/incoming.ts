@@ -78,6 +78,8 @@ const executeCommand = async (text: string, to: string, from: string) => {
                 firebaseAdmin.firestore.FieldValue.arrayRemove(first.users.filter(user => user.phoneNum == from)[0])})
                 const customerUpdate = await firebaseAdmin.firestore().collection('customers').doc(from).update({ programs: 
                     firebaseAdmin.firestore.FieldValue.arrayRemove(customer.programs.filter(program => program.id == first.id)[0]) })
+                const customerUpdate2 = await firebaseAdmin.firestore().collection('customers').doc(from).update({ programs:
+                        firebaseAdmin.firestore.FieldValue.arrayRemove(first.id) })
                 return `You have successfully left @${first.uniqueCode}`
             }
         case 'rewards':
@@ -147,11 +149,13 @@ const handleJoin = async (from: string, text: string) => {
             date: new Date().toString()
         })}) 
         const customerUpdate = await firebaseAdmin.firestore().collection('customers').doc(from).update({ programs: 
-        firebaseAdmin.firestore.FieldValue.arrayUnion({
-            id: first.id,
-            uniqueCode: first.uniqueCode,
-            joined: new Date().toString()
-        })})
+            firebaseAdmin.firestore.FieldValue.arrayUnion({
+                id: first.id,
+                uniqueCode: first.uniqueCode,
+                joined: new Date().toString()
+            })})
+        const customerUpdate2 = await firebaseAdmin.firestore().collection('customers').doc(from).update({ programs:
+                firebaseAdmin.firestore.FieldValue.arrayUnion(first.id)})
         return `You have successfully joined @${code}. Text LEAVE to leave it.`
     }
 }

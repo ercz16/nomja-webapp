@@ -42,12 +42,12 @@ const BaseModal = (props) => {
             </Transition.Child>
 
             <span
-              className="inline-block h-screen align-middle"
+              className="inline-block align-middle"
               aria-hidden="true"
             >
               &#8203;
             </span>
-            <Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
+            <Dialog.Overlay className="fixed inset-0 bg-black opacity-50" />
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-100"
@@ -57,7 +57,7 @@ const BaseModal = (props) => {
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <div className="inline-block w-5/12 p-8 mt-24 transition-all transform bg-gray-100 rounded shadow-sm">
+              <div className="inline-block w-5/12 p-8 mt-24 transition-all transform bg-white rounded shadow-sm">
                 <div className="flex flex-col justify-between space-y-3 divide-y-2">
                   <div>
                     <Dialog.Title

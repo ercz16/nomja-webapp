@@ -131,13 +131,107 @@ const Loading = () => (
 )
 
 const Analytics = (props) => {
-  const router = useRouter()
-  const { user, programs, data } = useAuth()
-  const program = !programs ? null : programs.filter(p => p.id == router.query.id)[0]
-  return (
-      <div className="h-screen">
-        <div className="p-4 border-b-2">Analytics</div>
-        <div>Total Customers: {program.users.length}</div>
+    const router = useRouter()
+    const { user, programs, data } = useAuth()
+    const program = !programs ? null : programs.filter(p => p.id == router.query.id)[0]
+
+    const [usersArr, setUsersArr] = useState([])
+
+    useEffect(() => {
+        firebase.firestore().collection('customers').where('programs', 'array-contains', program.id).get().then((query) => {
+            for (const doc of query.docs) {
+                setUsersArr(usersArr.concat(doc.data()))
+            }
+        })
+    }, [])
+
+    const getNumberOfActiveCustomers = () => {
+        var numberOfActive = 0
+        for (const user of usersArr) {
+            for (const msg of user.messageHistory) {
+                if (msg.to == program.phoneNum && new Date(msg.at).getMonth() == new Date().getMonth()) {
+                    numberOfActive++
+                    break
+                }
+            }
+        }
+        return numberOfActive
+    }
+
+    const getDailyCustomers = () => {
+        var numberOfDaily = 0
+        for (const user of usersArr) {
+            for (const msg of user.messageHistory) {
+                if (msg.to == program.phoneNum && new Date(msg.at).getDay() == new Date().getDay()) {
+                    numberOfDaily++
+                    break
+                }
+            }
+        }
+        return numberOfDaily
+    }
+
+    const getJoinedThisMonth = () => {
+        var joinedThisMonth = 0
+        for (const user of usersArr) {
+            for (const joinedProgram of user.programs) {
+                if (typeof joinedProgram === 'object' && joinedProgram !== null) {
+                    console.log(joinedProgram)
+                    if (program.uniqueCode == joinedProgram.uniqueCode && new Date(joinedProgram.joined).getMonth() == new Date().getMonth()) {
+                        joinedThisMonth++
+                    }
+                }
+            }
+        }
+        return joinedThisMonth
+    }
+
+    return (
+      <div className="flex flex-col py-4">
+        <div className="container mx-auto px-32">
+            <div className="flex flex-col gap-2">
+                <p className="font-medium text-xl">Overview</p>
+                <div className="flex flex-row gap-8">
+                    <div className="flex flex-col gap-y-2 rounded-lg shadow border w-3/12 bg-gray-100 bg-opacity-25">
+                        <div className="flex flex-col pt-2 px-4 h-full">
+                            <p className="font-medium text-lg text-gray-600">Total Customers</p>
+                            <p className="text-gray-400 text-sm">{ program.name }'s customers</p>
+                        </div>
+                        <div className="flex flex-row py-2 border-t bg-gray-100 px-4">
+                            <p className="text-gray-800 text-lg font-medium">{ program.users.length }</p>
+                        </div>
+                    </div>
+                    <div className="flex flex-col gap-y-2 rounded-lg shadow border w-3/12 bg-gray-100 bg-opacity-25">
+                        <div className="flex flex-col pt-2 px-4">
+                            <p className="font-medium text-lg text-gray-600">Active Customers</p>
+                            <p className="text-gray-400 text-sm">Customers that have sent a text message in the past month.</p>
+                        </div>
+                        <div className="flex flex-row py-2 border-t bg-gray-100 px-4">
+                            <p className="text-gray-800 text-lg font-medium">{ getNumberOfActiveCustomers() }</p>
+                        </div>
+                    </div>
+                    <div className="flex flex-col gap-y-2 rounded-lg shadow border w-3/12 bg-gray-100 bg-opacity-25">
+                        <div className="flex flex-col pt-2 px-4 h-full">
+                            <p className="font-medium text-lg text-gray-600">New Customers</p>
+                            <p className="text-gray-400 text-sm">Customers that have joined this month.</p>
+                        </div>
+                        <div className="flex flex-row py-2 border-t bg-gray-100 px-4">
+                            <p className="text-gray-800 text-lg font-medium">{ getJoinedThisMonth() }</p>
+                        </div>
+                    </div>
+                    <div className="flex flex-col gap-y-2 rounded-lg shadow border w-3/12 bg-gray-100 bg-opacity-25">
+                        <div className="flex flex-col pt-2 px-4 h-full">
+                            <p className="font-medium text-lg text-gray-600">Daily Customers</p>
+                            <p className="text-gray-400 text-sm">Customers that have sent a text today.</p>
+                        </div>
+                        <div className="flex flex-row py-2 border-t bg-gray-100 px-4">
+                            <p className="text-gray-800 text-lg font-medium">{ getDailyCustomers() }</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div>Total Customers: { !program ? "Loading.." : program.users.length}</div>
         <div>Active Customers: </div>
         <div>New Customers</div>
         <div>Daily/montly customers</div>
@@ -155,14 +249,17 @@ const Analytics = (props) => {
 }
 
 const Index = (props) => {
-  return (
-    <div className="flex flex-row">
-      <Sidebar props={props} />
-      <div className="flex flex-col w-full">
-        <Navbar />
-        <Analytics />
-      </div>
-    </div>
+    const router = useRouter()
+    const { user, programs, data } = useAuth()
+    const program = !programs ? null : programs.filter(p => p.id == router.query.id)[0]
+    return (
+        <div className="flex flex-row">
+            <Sidebar props={props} />
+            <div className="flex flex-col w-full">
+                <Navbar />
+                { !program ? "Loading..." : <Analytics /> }
+            </div>
+        </div>
   )
 }
 

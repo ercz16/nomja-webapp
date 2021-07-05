@@ -55,8 +55,6 @@ const Rewards = (props) => {
     const program = !programs ? null : programs.filter(p => p.id == router.query.id)[0]
     const [open, setOpen] = useState(false)
 
-    console.table(program)
-
     return (
         <div className="flex flex-col py-6 px-12 gap-1">
             <div className="flex flex-row items-center justify-between border-b py-2">

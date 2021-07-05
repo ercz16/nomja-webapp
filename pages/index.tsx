@@ -167,7 +167,7 @@ const LandingSection = () => {
 
 const FeaturesSection = () => {
   return (
-    <div className="py-16 bg-white">
+    <div onClick={() => window.alert('Dab')} className="py-16 bg-white">
       <div className="container px-16 mx-auto">
         <div className="grid grid-cols-4 gap-8">
           <div className="flex flex-col gap-1">

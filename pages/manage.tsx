@@ -4,6 +4,8 @@ import Link from 'next/link'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 
+import { FocusTrap } from '@headlessui/react'
+
 import { getSSRPropsUser } from '../utils/auth/ServerAuth'
 import { Dialog, Transition } from '@headlessui/react'
 
@@ -20,6 +22,32 @@ import {
 export const getServerSideProps = async (ctx) => {
   const props = await getSSRPropsUser(ctx)
   return props
+}
+
+const AccountDropdown = () => {
+  const [open, setOpen] = useState(false)
+  return (
+      <>
+        <button onClick={() => setOpen(!open)} className="flex items-center gap-1 text-gray-400 hover:text-gray-200">
+          Account
+          { open ?
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
+              </svg>
+              : <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg> }
+        </button>
+        <div className={`${open ? '' : 'hidden'} absolute mt-16 bg-white rounded shadow flex flex-col divide-y`}>
+          <div className="flex items-center gap-2 px-4 py-2">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            <p className="text-gray-600">Logout</p>
+          </div>
+        </div>
+      </>
+  )
 }
 
 const Manage = (props) => {
@@ -39,11 +67,19 @@ const Manage = (props) => {
       <Head>
         <title>Manage - Nomja</title>
       </Head>
-      <div className="flex flex-row p-4 border-b">
-        <div className="px-32">
-          <Link href='/'>
-            <a className="text-5xl font-bold text-indigo-500 hover:text-indigo-600">nomja</a>
-          </Link>
+      <div className="border-b bg-gray-900">
+        <div className="flex justify-between items-center container mx-auto px-32 py-4">
+          <div className="flex items-center gap-4">
+            <Link href='/'>
+              <a className="text-4xl font-bold text-white -mt-1">nomja</a>
+            </Link>
+            <Link href='/manage'>
+              <a className="text-gray-100">Dashboard</a>
+            </Link>
+          </div>
+          <div className="flex items-center gap-4">
+            <AccountDropdown />
+          </div>
         </div>
       </div>
       <div className="flex flex-col min-h-screen gap-2 px-5 py-5 bg-gray-100">
