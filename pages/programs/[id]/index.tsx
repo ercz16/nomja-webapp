@@ -102,6 +102,13 @@ const Navbar = (props) => {
   const { user, programs, data } = useAuth()
   const program = !programs ? null : programs.filter(p => p.id == router.query.id)
 
+    const [show, setShow] = useState(false)
+
+    const handleLogout = async (e) => {
+        const logout = await firebase.auth().signOut()
+        const redirect = await router.push('/auth/signin')
+    }
+
   return (
     <div className="flex flex-row items-center justify-between w-full h-16 px-8 border-b">
       <div className="flex flex-row items-center gap-4">
@@ -110,14 +117,34 @@ const Navbar = (props) => {
         </Link>
         
       </div>
-      <div className="flex flex-row items-center gap-2 rounded-lg cursor-pointer border border-white hover:border-gray-200 px-2 py-1">
-        <svg xmlns="http://www.w3.org/2000/svg" className={`p-1 text-gray-600 bg-gray-100 rounded-full fill-current w-7 h-7 bg-opacity-500 ${!data ? 'animate-pulse' : ''}`} viewBox="0 0 20 20" fill="currentColor">
-          <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-        </svg>
-        {!data ? <div className="w-24 h-4 bg-gray-100 rounded-lg animate-pulse" /> :
-          <p className="text-lg text-gray-600">{ data.name.first + ' ' + data.name.last }</p>
-        }
-      </div>
+        <div className="relative">
+            <div className="bg-white dark:bg-gray-800 flex gap-2 items-center rounded border-gray-300 dark:border-gray-700 w-48 cursor-pointer" onClick={() => setShow(!show)}>
+                <p className="pl-3 py-3 text-gray-600 leading-3 tracking-normal font-normal">{ !data ? "" : data.name.first + " " + data.name.last }</p>
+                <div className="cursor-pointer text-gray-600 dark:text-gray-400 mr-3">
+                    {!show ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" className=" icon icon-tabler icon-tabler-chevron-up" width={20} height={20} viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" />
+                            <polyline points="6 9 12 15 18 9" />
+                        </svg>
+                    ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-chevron-up" width={20} height={20} viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" />
+                            <polyline points="6 15 12 9 18 15" />
+                        </svg>
+                    )}
+                </div>
+            </div>
+            {show && (
+                <div className="flex flex-col divide-y border border-gray-300 visible transition duration-300 opacity-100 bg-white dark:bg-gray-800 shadow rounded mt-2 w-48 absolute">
+                    <button onClick={handleLogout} className="cursor-pointer flex items-center gap-1 text-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 text-sm leading-3 tracking-normal p-3 hover:bg-gray-100 font-normal">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clipRule="evenodd" />
+                        </svg>
+                        Logout
+                    </button>
+                </div>
+            )}
+        </div>
     </div>
   )
 }
@@ -158,6 +185,19 @@ const Analytics = (props) => {
         return numberOfActive
     }
 
+    const getNumberOfInactiveCustomers = () => {
+        var numberOfInactive = 0
+        for (const user of usersArr) {
+            for (const msg of user.messageHistory) {
+                if (msg.to == program.phoneNum && new Date(msg.at).getMonth() != new Date().getMonth()) {
+                    numberOfInactive++
+                    break
+                }
+            }
+        }
+        return numberOfInactive
+    }
+
     const getDailyCustomers = () => {
         var numberOfDaily = 0
         for (const user of usersArr) {
@@ -176,7 +216,6 @@ const Analytics = (props) => {
         for (const user of usersArr) {
             for (const joinedProgram of user.programs) {
                 if (typeof joinedProgram === 'object' && joinedProgram !== null) {
-                    console.log(joinedProgram)
                     if (program.uniqueCode == joinedProgram.uniqueCode && new Date(joinedProgram.joined).getMonth() == new Date().getMonth()) {
                         joinedThisMonth++
                     }
@@ -186,13 +225,52 @@ const Analytics = (props) => {
         return joinedThisMonth
     }
 
+    const getReceiptsRedeemed = () => {
+        var receipts = 0
+        for (const user of usersArr) {
+            for (const reward of user.rewards) {
+                if (reward.phoneNum == program.phoneNum && reward.type == 'VISIT') {
+                    receipts++
+                }
+            }
+        }
+        return receipts
+    }
+
+    const getMoneyGained = () => {
+        var moneyGained = 0.0
+        for (const user of usersArr) {
+            for (const reward of user.rewards) {
+                if (reward.phoneNum == program.phoneNum && new Date(reward.date).getMonth() == new Date().getMonth() && reward.type == 'POINTS') {
+                    moneyGained += reward.amount
+                }
+            }
+        }
+        return moneyGained
+    }
+
+    const getAverageReceipt = () => {
+        return getMoneyGained() / getReceiptsRedeemed()
+    }
+
+    const getReturnRate = () => {
+        var totalCameBack = 0
+        if (usersArr.length == 0) return 0
+        for (const user of usersArr) {
+            const rewards = user.rewards.filter(reward => reward.phoneNum == program.phoneNum && reward.type == 'VISIT')
+            if (rewards.length > 1) {
+                totalCameBack++
+            }
+        }
+        return (totalCameBack / usersArr.length).toFixed(2)
+    }
+
     return (
       <div className="flex flex-col py-4">
         <div className="container mx-auto px-32">
-            <div className="flex flex-col gap-2">
-                <p className="font-medium text-xl">Overview</p>
-                <div className="flex flex-row gap-8">
-                    <div className="flex flex-col gap-y-2 rounded-lg shadow border w-3/12 bg-gray-100 bg-opacity-25">
+            <div className="flex flex-col gap-4">
+                <div className="grid grid-cols-4 gap-8">
+                    <div className="flex flex-col gap-y-2 rounded-lg shadow border  bg-gray-100 bg-opacity-25">
                         <div className="flex flex-col pt-2 px-4 h-full">
                             <p className="font-medium text-lg text-gray-600">Total Customers</p>
                             <p className="text-gray-400 text-sm">{ program.name }'s customers</p>
@@ -201,7 +279,7 @@ const Analytics = (props) => {
                             <p className="text-gray-800 text-lg font-medium">{ program.users.length }</p>
                         </div>
                     </div>
-                    <div className="flex flex-col gap-y-2 rounded-lg shadow border w-3/12 bg-gray-100 bg-opacity-25">
+                    <div className="flex flex-col gap-y-2 rounded-lg shadow border  bg-gray-100 bg-opacity-25">
                         <div className="flex flex-col pt-2 px-4">
                             <p className="font-medium text-lg text-gray-600">Active Customers</p>
                             <p className="text-gray-400 text-sm">Customers that have sent a text message in the past month.</p>
@@ -210,7 +288,7 @@ const Analytics = (props) => {
                             <p className="text-gray-800 text-lg font-medium">{ getNumberOfActiveCustomers() }</p>
                         </div>
                     </div>
-                    <div className="flex flex-col gap-y-2 rounded-lg shadow border w-3/12 bg-gray-100 bg-opacity-25">
+                    <div className="flex flex-col gap-y-2 rounded-lg shadow border  bg-gray-100 bg-opacity-25">
                         <div className="flex flex-col pt-2 px-4 h-full">
                             <p className="font-medium text-lg text-gray-600">New Customers</p>
                             <p className="text-gray-400 text-sm">Customers that have joined this month.</p>
@@ -219,7 +297,7 @@ const Analytics = (props) => {
                             <p className="text-gray-800 text-lg font-medium">{ getJoinedThisMonth() }</p>
                         </div>
                     </div>
-                    <div className="flex flex-col gap-y-2 rounded-lg shadow border w-3/12 bg-gray-100 bg-opacity-25">
+                    <div className="flex flex-col gap-y-2 rounded-lg shadow border  bg-gray-100 bg-opacity-25">
                         <div className="flex flex-col pt-2 px-4 h-full">
                             <p className="font-medium text-lg text-gray-600">Daily Customers</p>
                             <p className="text-gray-400 text-sm">Customers that have sent a text today.</p>
@@ -229,21 +307,57 @@ const Analytics = (props) => {
                         </div>
                     </div>
                 </div>
+                <div className="grid grid-cols-4 gap-8">
+                    <div className="flex flex-col gap-y-2 rounded-lg shadow border bg-gray-100 bg-opacity-25">
+                        <div className="flex flex-col pt-2 px-4 h-full">
+                            <p className="font-medium text-lg text-gray-600">Redeemed Receipts</p>
+                            <p className="text-gray-400 text-sm">Receipts redeemed in the past month</p>
+                        </div>
+                        <div className="flex flex-row py-2 border-t bg-gray-100 px-4">
+                            <p className="text-gray-800 text-lg font-medium">{ getReceiptsRedeemed() }</p>
+                        </div>
+                    </div>
+                    <div className="flex flex-col gap-y-2 rounded-lg shadow border  bg-gray-100 bg-opacity-25">
+                        <div className="flex flex-col pt-2 px-4">
+                            <p className="font-medium text-lg text-gray-600">Inactive Customers</p>
+                            <p className="text-gray-400 text-sm">Customers that have not sent a text message in the past month.</p>
+                        </div>
+                        <div className="flex flex-row py-2 border-t bg-gray-100 px-4">
+                            <p className="text-gray-800 text-lg font-medium">{ getNumberOfInactiveCustomers() }</p>
+                        </div>
+                    </div>
+                    <div className="flex flex-col gap-y-2 rounded-lg shadow border  bg-gray-100 bg-opacity-25">
+                        <div className="flex flex-col pt-2 px-4 h-full">
+                            <p className="font-medium text-lg text-gray-600">Money Gained</p>
+                            <p className="text-gray-400 text-sm">Profit made from rewards in the past month.</p>
+                        </div>
+                        <div className="flex flex-row py-2 border-t bg-gray-100 px-4">
+                            <p className="text-gray-800 text-lg font-medium">${ getMoneyGained() }</p>
+                        </div>
+                    </div>
+                    <div className="flex flex-col gap-y-2 rounded-lg shadow border  bg-gray-100 bg-opacity-25">
+                        <div className="flex flex-col pt-2 px-4 h-full">
+                            <p className="font-medium text-lg text-gray-600">Average Receipt Price</p>
+                            <p className="text-gray-400 text-sm">Average of receipt prices in the past month.</p>
+                        </div>
+                        <div className="flex flex-row py-2 border-t bg-gray-100 px-4">
+                            <p className="text-gray-800 text-lg font-medium">${ getAverageReceipt() }</p>
+                        </div>
+                    </div>
+                </div>
+                <div className="grid grid-cols-4 gap-8">
+                    <div className="flex flex-col gap-y-2 rounded-lg shadow border  bg-gray-100 bg-opacity-25">
+                        <div className="flex flex-col pt-2 px-4 h-full">
+                            <p className="font-medium text-lg text-gray-600">Return rate</p>
+                            <p className="text-gray-400 text-sm">Percentage of customers that returned more than once.</p>
+                        </div>
+                        <div className="flex flex-row py-2 border-t bg-gray-100 px-4">
+                            <p className="text-gray-800 text-lg font-medium">{ getReturnRate() }%</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        <div>Total Customers: { !program ? "Loading.." : program.users.length}</div>
-        <div>Active Customers: </div>
-        <div>New Customers</div>
-        <div>Daily/montly customers</div>
-        <div>Redeemed receipts in last day/month</div>
-        <div>Users Inactive: </div>
-        <div>Money gained from rewards</div>
-        <div>Average number of visits per monrth</div>
-        <div>Popular rewards</div>
-        <div>average ticket cost</div>
-        <div>Come back rate</div>
-        <div>Likelihood that a customer will return (returning/ 1 visit)</div>
-        <div>Most Active time of day:</div>
       </div>
   )
 }
@@ -257,7 +371,7 @@ const Index = (props) => {
             <Sidebar props={props} />
             <div className="flex flex-col w-full">
                 <Navbar />
-                { !program ? "Loading..." : <Analytics /> }
+                { !program ? <></> : <Analytics /> }
             </div>
         </div>
   )

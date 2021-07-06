@@ -57,7 +57,7 @@ const BaseModal = (props) => {
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <div className="inline-block w-5/12 p-8 mt-24 transition-all transform bg-white rounded shadow-sm">
+              <div className="inline-block w-5/12 p-6 mt-24 transition-all transform bg-white rounded shadow-sm">
                 <div className="flex flex-col justify-between space-y-3 divide-y-2">
                   <div>
                     <Dialog.Title

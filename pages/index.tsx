@@ -5,161 +5,139 @@ import Link from 'next/link'
 import Head from 'next/head'
 
 const Navbar = (props) => {
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    window.addEventListener('scroll', (e) => {
+      const offsetY = window.pageYOffset
+      console.log(offsetY)
+      if (offsetY > 5) {
+        setScrolled(true)
+      } else {
+        setScrolled(false)
+      }
+    })
+  }, [])
+
+  const [showCompany, setShowCompany] = useState(false)
+
   return (
-    <div className="relative z-10 flex flex-row items-center justify-between p-4 px-32 bg-white shadow-sm">
-      <Link href='/'>
-        <a className="text-5xl font-extrabold text-indigo-500 hover:text-indigo-600">nomja</a>
-      </Link>
-      <div className="flex flex-row items-center gap-4">
-        <Link href="/features">
-          <a className="flex flex-row items-center gap-1 text-xl text-gray-800 cursor-pointer hover:text-black">Features</a>
+      <div className={`${scrolled ? 'bg-white border-b shadow transition ease-in-out duration-500 transform translate-y-5 -mt-5' : ''} fixed flex justify-between w-full items-center z-20 px-64 py-4`}>
+        <Link href='/'>
+          <a className="text-indigo-500 hover:text-indigo-600 text-5xl font-bold leading-1 flex">
+            <img className="" width="196" src="/assets/all-together.png" />
+          </a>
         </Link>
-        <Link href="/pricing">
-          <a className="flex flex-row items-center gap-1 text-xl text-gray-800 cursor-pointer hover:text-black">Pricing</a>
-        </Link>
-        <Menu as="div" className="relative inline-block text-left">
-          <Menu.Button className="flex flex-row items-center justify-center text-lg text-xl text-gray-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
-            Resources
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-            </svg>
-          </Menu.Button>
-          <Transition
-            as={Fragment}
-            enter="transition ease-out duration-100"
-            enterFrom="transform opacity-0 scale-95"
-            enterTo="transform opacity-100 scale-100"
-            leave="transition ease-in duration-75"
-            leaveFrom="transform opacity-100 scale-100"
-            leaveTo="transform opacity-0 scale-95"
-          >
-            <Menu.Items className="absolute right-0 z-10 mt-3 origin-top-right bg-white rounded shadow w-max ring-1 ring-black ring-opacity-5 focus:outline-none">
-              <div className="p-4">
-                <Menu.Item>
-                  {({ active }) => (
-                    <div className="flex flex-col col-span-1 gap-2 p-2">
-                      <Link href='/resources/request-demo'>
-                        <a className="flex flex-row items-center gap-2 text-lg text-gray-800 rounded hover:text-black hover:underline">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 p-1 text-white bg-indigo-500 rounded-lg fill-current" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
-                          </svg>
-                          Demo
-                        </a>
-                      </Link>
-                      <Link href='/resources/help-center'>
-                        <a className="flex flex-row items-center gap-2 text-lg text-gray-800 rounded hover:text-black hover:underline">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 p-1 text-white bg-indigo-500 rounded-lg fill-current" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M9 3a1 1 0 012 0v5.5a.5.5 0 001 0V4a1 1 0 112 0v4.5a.5.5 0 001 0V6a1 1 0 112 0v5a7 7 0 11-14 0V9a1 1 0 012 0v2.5a.5.5 0 001 0V4a1 1 0 012 0v4.5a.5.5 0 001 0V3z" clipRule="evenodd" />
-                          </svg>
-                          Help Center
-                        </a>
-                      </Link>
-                    </div>
-                  )}
-                </Menu.Item>
+        <div className={`${scrolled ? '' : 'hidden'} flex items-center gap-6`}>
+          <Link href='/features'>
+            <a className="text-gray-700 font-medium">Features</a>
+          </Link>
+          <Link href='/pricing'>
+            <a className="text-gray-700 font-medium">Pricing</a>
+          </Link>
+          <div className="relative">
+            <div className="flex items-center gap-1 cursor-pointer" onClick={() => setShowCompany(!showCompany)}>
+              <p className="py-3 text-gray-700 font-medium">Company</p>
+              <div className="cursor-pointer text-gray-600 mr-3">
+                {!showCompany ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" className=" icon icon-tabler icon-tabler-chevron-up" width={20} height={20} viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                      <path stroke="none" d="M0 0h24v24H0z" />
+                      <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-chevron-up" width={20} height={20} viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                      <path stroke="none" d="M0 0h24v24H0z" />
+                      <polyline points="6 15 12 9 18 15" />
+                    </svg>
+                )}
               </div>
-            </Menu.Items>
-          </Transition>
-        </Menu>
-        <Menu as="div" className="relative inline-block text-left">
-          <Menu.Button className="flex flex-row items-center justify-center text-lg text-xl text-gray-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
-            Company
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-            </svg>
-          </Menu.Button>
-          <Transition
-            as={Fragment}
-            enter="transition ease-out duration-100"
-            enterFrom="transform opacity-0 scale-95"
-            enterTo="transform opacity-100 scale-100"
-            leave="transition ease-in duration-75"
-            leaveFrom="transform opacity-100 scale-100"
-            leaveTo="transform opacity-0 scale-95"
-          >
-            <Menu.Items className="absolute right-0 z-10 w-64 mt-3 origin-top-right bg-white divide-y divide-gray-100 rounded shadow ring-1 ring-black ring-opacity-5 focus:outline-none">
-              <div className="p-4">
-                <Menu.Item>
-                  {({ active }) => (
+            </div>
+            <Transition
+                show={showCompany}
+                enter="transition-opacity duration-200"
+                enterFrom="opacity-0"
+                enterTo="opacity-100"
+                leave="transition-opacity duration-200"
+                leaveFrom="opacity-100"
+                leaveTo="opacity-0"
+            >
+              <div className="flex border border-gray-300 py-5 border-opacity-50 visible transition duration-300 opacity-100 bg-white dark:bg-gray-800 shadow rounded mt-2 w-max py-1 absolute">
+                  <div className="flex flex-col px-6 gap-2">
+                    <p className="text-gray-700 font-medium leading-3 tracking-normal">Company</p>
                     <Link href='/company/about-us'>
-                      <a
-                        className={`${active ? 'text-black' : 'text-gray-800'
-                          } group flex rounded items-center w-full px-2 py-2 text-md font-medium`}
-                      >
-                        About Us
-                  </a>
+                      <a className="text-gray-500 hover:text-gray-700 text-sm leading-3 tracking-normal">About Us</a>
                     </Link>
-                  )}
-                </Menu.Item>
-                <Menu.Item>
-                  {({ active }) => (
-                    <Link href='/company/about-us'>
-                      <a
-                        className={`${active ? 'text-black' : 'text-gray-800'
-                          } group flex rounded items-center w-full px-2 py-2 text-md font-medium`}
-                      >
-                        Contact Us
-                  </a>
+                    <Link href='/company/contact-us'>
+                      <a className="text-gray-500 hover:text-gray-700 text-sm leading-3 tracking-normal">Contact Us</a>
                     </Link>
-                  )}
-                </Menu.Item>
-                <Menu.Item>
-                  {({ active }) => (
-                    <Link href='/company/about-us'>
-                      <a
-                        className={`${active ? 'text-black' : 'text-gray-800'
-                          } group flex rounded items-center w-full px-2 py-2 text-md font-medium`}
-                      >
-                        Careers
-                  </a>
+                    <Link href='/company/resources'>
+                      <a className="text-gray-500 hover:text-gray-700 text-sm leading-3 tracking-normal">Resources</a>
                     </Link>
-                  )}
-                </Menu.Item>
+                  </div>
+                <div className="flex flex-col px-6 gap-2">
+                  <p className="text-gray-700 font-medium leading-3 tracking-normal">Legal</p>
+                  <Link href='/legal/privacy-policy'>
+                    <a className="text-gray-500 hover:text-gray-700 text-sm leading-3 tracking-normal">Privacy Policy</a>
+                  </Link>
+                  <Link href='/legal/terms-of-service'>
+                    <a className="text-gray-500 hover:text-gray-700 text-sm leading-3 tracking-normal">Terms of Service</a>
+                  </Link>
+                </div>
               </div>
-            </Menu.Items>
-          </Transition>
-        </Menu>
-        <Link href="/auth/signin">
-          <button className="px-2 py-1 text-xl font-semibold text-indigo-500 border-2 border-indigo-500 rounded-lg hover:text-indigo-600 hover:border-indigo-600">
-            Sign in
-          </button>
-        </Link>
-        <Link href="/auth/signup">
-          <button className="px-2 py-1 text-xl font-semibold text-white bg-indigo-500 border-2 border-indigo-500 rounded-lg hover:bg-indigo-600 hover:border-indigo-600">
-            Create Account
-          </button>
-        </Link>
+            </Transition>
+          </div>
+        </div>
+        <div className="flex items-center gap-1">
+          <Link href='/auth/signin'>
+            <a className={`rounded text-indigo-500 hover:text-indigo-600 px-3 font-medium py-2 flex items-center gap-1`}>
+              Sign In
+            </a>
+          </Link>
+          <Link href='/auth/signup'>
+            <a className={`bg-indigo-500 hover:bg-indigo-600 border-2 border-indigo-500 hover:border-indigo-600 text-white px-3 py-2 rounded shadow font-medium flex items-center gap-1`}>
+              Create Account
+            </a>
+          </Link>
+        </div>
       </div>
-    </div>
   )
 }
 
 const LandingSection = () => {
+  const [showing, setShowing] = useState(true)
   return (
     <>
-      <div className="absolute z-0 -mt-96 -ml-96">
-        <svg style={{ width: '64rem' }} className="text-gray-100 text-opacity-75 fill-current" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <div className="hidden absolute z-0 -mt-20 top-0 right-0 w-1/2">
+        <svg style={{ width: '64rem' }} className="text-indigo-800 fill-current" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
           <path d="M44.8,-56.4C54.3,-45.4,55.7,-27.7,55.9,-12C56,3.6,54.9,17.3,49.1,29.5C43.4,41.6,33.1,52.2,18.7,62.2C4.2,72.1,-14.4,81.5,-25.7,75.3C-37,69.2,-40.9,47.5,-47.3,30.3C-53.8,13,-62.8,0.2,-61.1,-10.9C-59.3,-22.1,-46.8,-31.5,-34.8,-42.1C-22.8,-52.7,-11.4,-64.5,3.1,-68.2C17.6,-71.9,35.2,-67.4,44.8,-56.4Z" transform="translate(100 100)" />
         </svg>
       </div>
-      <div className="relative grid items-center grid-cols-2 gap-12 px-32 py-32 shadow-b-lg">
-        <div className="flex flex-col gap-6">
-          <p className="text-5xl font-bold text-gray-800">Grow your company with a modernized <span className="inline text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-indigo-300 to-indigo-700">rewards</span> system</p>
-          <p className="text-2xl font-light text-gray-600">Get the most out of your customers and encourage them to come back using a modernized loyalty program all through text messaging.</p>
-          <div className="flex flex-row items-center">
+      <div className="relative grid items-center grid-cols-2 gap-12 px-64 py-32 shadow-b-lg">
+        <div className="flex flex-col gap-5">
+          <p className="text-6xl font-bold text-gray-800">The modern way to gain <span className="inline text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-bl from-indigo-500 to-indigo-800">retention</span></p>
+          <p className="text-2xl font-light text-gray-700">Get the most out of your customers and encourage them to come back using a modernized loyalty program all through text messaging.</p>
+          <div className="flex flex-row gap-3 items-center">
             <Link href="/auth/signup">
-              <a className="flex flex-row items-center gap-1 p-2 text-xl font-semibold text-white bg-indigo-500 rounded-lg shadow-sm hover:bg-indigo-600">
-                Get Started
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              </a>
+              <a className="px-4 py-2 text-xl font-medium text-white bg-indigo-500 hover:bg-indigo-600 rounded shadow">Get Started</a>
+            </Link>
+            <Link href='/features'>
+              <a className="text-lg font-medium text-indigo-500 hover:text-indigo-600">Learn more</a>
             </Link>
           </div>
         </div>
-        <div className="flex items-center justify-center">
-          <img className="rounded-lg shadow h-96" src="landing.jpg" />
-        </div>
+        <Transition
+            show={showing}
+            enter="transition-opacity duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="transition-opacity duration-300"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+        >
+          <div className="flex flex-col items-center justify-center">
+            <img className="w-1/2" src="/assets/iphone_demo.png" />
+          </div>
+        </Transition>
       </div>
     </>
   )
@@ -359,6 +337,14 @@ const Footer = () => {
   )
 }
 
+const WhyUsSection = () => {
+  return (
+      <div className="grid grid-cols-2 gap-4 px-64">
+        
+      </div>
+  )
+}
+
 const HomePage = () => {
   return (
     <>
@@ -367,9 +353,7 @@ const HomePage = () => {
       </Head>
       <Navbar />
       <LandingSection />
-      <HelpSection />
-      <FeaturesSection />
-      <LastCTA />
+      <WhyUsSection />
       <Footer />
     </>
   )

@@ -69,8 +69,8 @@ const SignIn = () => {
                                     <input type="checkbox" name="rememberMe" className="rounded form-checkbox focus:outline-none" />
                                     <span className="ml-2">Remember me</span>
                                 </label>
-                                <Link href="/forgotpass">
-                                    <a className="font-medium text-indigo-500 justify-self-end text-md hover:text-blue-600 hover:underline">Forgot your password?</a>
+                                <Link href="/auth/forgotPassword">
+                                    <a className="font-medium text-indigo-500 justify-self-end text-md hover:text-indigo-600 hover:underline">Forgot your password?</a>
                                 </Link>
                             </div>
                             <div className="flex flex-col mt-2">

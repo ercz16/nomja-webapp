@@ -7,7 +7,7 @@ const CreateButton = (props) => {
         onClick={action}
         className="flex flex-row items-center gap-2 px-3 py-2 bg-indigo-500 rounded shadow hover:bg-indigo-600"
       >
-        <span className="text-lg font-semibold text-white">{children}</span>
+        <span className="font-medium text-white">{children}</span>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           className="w-6 h-6 text-white"

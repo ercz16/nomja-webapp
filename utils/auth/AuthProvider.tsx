@@ -17,23 +17,33 @@ export function AuthProvider({ children }) {
         return auth().onIdTokenChanged(async (user) => {
             if (!user) {
                 setUser(null)
+                setPrograms(null)
+                setData(null)
                 nookies.destroy(null, "token")
                 nookies.set(null, "token", "", { path: '/' })
             } else {
-                const token = await user.getIdToken()
-                const userDoc = await firestore().collection('users').doc(user.uid).get()
-                const programs = new Array()
-                if (userDoc.exists) {
-                    for (const program of userDoc.data().programs) {
-                        const programDoc = await firestore().collection('programs').doc(program.id).get()
-                        programs.push(programDoc.data())
+                try {
+                    const token = await user.getIdToken()
+                    const userDoc = await firestore().collection('users').doc(user.uid).get()
+                    const programs = new Array()
+                    if (userDoc.exists) {
+                        for (const program of userDoc.data().programs) {
+                            const programDoc = await firestore().collection('programs').doc(program.id).get()
+                            programs.push(programDoc.data())
+                        }
                     }
+                    setUser(user)
+                    setData(userDoc.exists ? userDoc.data() : null)
+                    setPrograms(programs)
+                    nookies.destroy(null, "token")
+                    nookies.set(null, "token", token, { path: '/' })
+                } catch (e) {
+                    setUser(null)
+                    setPrograms(null)
+                    setData(null)
+                    nookies.destroy(null, "token")
+                    nookies.set(null, "token", "", { path: '/' })
                 }
-                setUser(user)
-                setData(userDoc.exists ? userDoc.data() : null)
-                setPrograms(programs)
-                nookies.destroy(null, "token")
-                nookies.set(null, "token", token, { path: '/' })
             }
         })
     }, [])
