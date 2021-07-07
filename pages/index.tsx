@@ -27,10 +27,10 @@ const Navbar = (props) => {
       <div className={`${scrolled ? 'bg-white border-b shadow transition ease-in-out duration-500 transform translate-y-1 -mt-1' : ''} fixed flex justify-between w-full items-center z-20 px-8 sm:px-16 md:px-32 xl:px-64 py-4`}>
         <Link href='/'>
           <a className="text-indigo-500 hover:text-indigo-600 text-5xl font-bold leading-1 flex">
-            <img className="" width="196" src="/assets/all-together.png" />
+            <img width="196" src="/assets/all-together.png" />
           </a>
         </Link>
-        <div className={`${scrolled ? '' : 'hidden'} hidden lg:flex items-center gap-6`}>
+        <div className={`${scrolled ? 'lg:flex' : 'hidden'} hidden items-center gap-6`}>
           <Link href='/features'>
             <a className="text-gray-700 font-medium">Features</a>
           </Link>
