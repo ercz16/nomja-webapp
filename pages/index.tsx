@@ -22,7 +22,7 @@ const Navbar = (props) => {
   const [showCompany, setShowCompany] = useState(false)
 
   return (
-      <div className={`${scrolled ? 'bg-white border-b shadow transition ease-in-out duration-500 transform translate-y-5 -mt-5' : ''} fixed flex justify-between w-full items-center z-20 px-64 py-4`}>
+      <div className={`${scrolled ? 'bg-white border-b shadow transition ease-in-out duration-500 transform translate-y-1 -mt-1' : ''} fixed flex justify-between w-full items-center z-20 px-64 py-4`}>
         <Link href='/'>
           <a className="text-indigo-500 hover:text-indigo-600 text-5xl font-bold leading-1 flex">
             <img className="" width="196" src="/assets/all-together.png" />

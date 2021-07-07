@@ -262,7 +262,7 @@ const Analytics = (props) => {
                 totalCameBack++
             }
         }
-        return (totalCameBack / usersArr.length).toFixed(2)
+        return (100 * (totalCameBack / usersArr.length)).toFixed(2)
     }
 
     return (
