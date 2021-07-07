@@ -20,15 +20,17 @@ const Navbar = (props) => {
   }, [])
 
   const [showCompany, setShowCompany] = useState(false)
+  const [mobileDrop, setMobileDrop] = useState(false)
 
   return (
-      <div className={`${scrolled ? 'bg-white border-b shadow transition ease-in-out duration-500 transform translate-y-1 -mt-1' : ''} fixed flex justify-between w-full items-center z-20 px-64 py-4`}>
+      <>
+      <div className={`${scrolled ? 'bg-white border-b shadow transition ease-in-out duration-500 transform translate-y-1 -mt-1' : ''} fixed flex justify-between w-full items-center z-20 px-8 sm:px-16 md:px-32 xl:px-64 py-4`}>
         <Link href='/'>
           <a className="text-indigo-500 hover:text-indigo-600 text-5xl font-bold leading-1 flex">
             <img className="" width="196" src="/assets/all-together.png" />
           </a>
         </Link>
-        <div className={`${scrolled ? '' : 'hidden'} flex items-center gap-6`}>
+        <div className={`${scrolled ? '' : 'hidden'} hidden lg:flex items-center gap-6`}>
           <Link href='/features'>
             <a className="text-gray-700 font-medium">Features</a>
           </Link>
@@ -87,7 +89,14 @@ const Navbar = (props) => {
             </Transition>
           </div>
         </div>
-        <div className="flex items-center gap-1">
+        <div className="lg:hidden flex items-center gap-1">
+          <button onClick={() => setMobileDrop(!mobileDrop)}>
+            <svg xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6 fill-current text-gray-600 transform ease-in-out duration-200 ${mobileDrop ? 'rotate-90' : ''} fill-current text-gray-800`} viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+            </svg>
+          </button>
+        </div>
+        <div className="items-center gap-1 hidden lg:flex">
           <Link href='/auth/signin'>
             <a className={`rounded text-indigo-500 hover:text-indigo-600 px-3 font-medium py-2 flex items-center gap-1`}>
               Sign In
@@ -100,6 +109,25 @@ const Navbar = (props) => {
           </Link>
         </div>
       </div>
+        <div className="relative lg:hidden z-20">
+          {mobileDrop && (
+              <div className="flex flex-col items-center gap-2 py-2 transition duration-300 opacity-100 bg-white border-b border-gray-300 rounded mt-20 py-1 fixed w-full">
+                <Link href='/features'>
+                  <a className="cursor-pointer text-gray-700 leading-3 text-lg tracking-normal px-3 py-3 rounded hover:bg-gray-100 font-normal">Features</a>
+                </Link>
+                <Link href='/pricing'>
+                  <a className="cursor-pointer text-gray-700 leading-3 text-lg tracking-normal px-3 py-3 rounded hover:bg-gray-100 font-normal">Pricing</a>
+                </Link>
+                <Link href='/auth/signin'>
+                  <a className="cursor-pointer text-indigo-500 hover:text-indigo-600 leading-3 text-lg rounded tracking-normal px-3 py-3 hover:bg-gray-100 font-normal">Sign In</a>
+                </Link>
+                <Link href='/signup'>
+                  <a className="cursor-pointer bg-indigo-500 text-white hover:bg-indigo-600 leading-3 text-lg tracking-normal px-3 py-3 rounded font-normal">Create Account</a>
+                </Link>
+              </div>
+          )}
+        </div>
+      </>
   )
 }
 
@@ -112,7 +140,7 @@ const LandingSection = () => {
           <path d="M44.8,-56.4C54.3,-45.4,55.7,-27.7,55.9,-12C56,3.6,54.9,17.3,49.1,29.5C43.4,41.6,33.1,52.2,18.7,62.2C4.2,72.1,-14.4,81.5,-25.7,75.3C-37,69.2,-40.9,47.5,-47.3,30.3C-53.8,13,-62.8,0.2,-61.1,-10.9C-59.3,-22.1,-46.8,-31.5,-34.8,-42.1C-22.8,-52.7,-11.4,-64.5,3.1,-68.2C17.6,-71.9,35.2,-67.4,44.8,-56.4Z" transform="translate(100 100)" />
         </svg>
       </div>
-      <div className="relative grid items-center grid-cols-2 gap-12 px-64 py-32 shadow-b-lg">
+      <div className="relative grid items-center grid-cols-1 lg:grid-cols-2 gap-12 px-8 sm:px-16 md:px-32 xl:px-64 py-32 shadow-b-lg">
         <div className="flex flex-col gap-5">
           <p className="text-6xl font-bold text-gray-800">The modern way to gain <span className="inline text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-bl from-indigo-500 to-indigo-800">retention</span></p>
           <p className="text-2xl font-light text-gray-700">Get the most out of your customers and encourage them to come back using a modernized loyalty program all through text messaging.</p>
@@ -241,8 +269,8 @@ const LastCTA = () => {
 
 const Footer = () => {
   return (
-    <div className="relative z-10 flex flex-col gap-12 px-48 py-16 bg-gray-800">
-      <div className="grid grid-cols-5 gap-4">
+    <div className="relative z-10 flex flex-col gap-12 px-8 sm:px-16 md:px-32 xl:px-48 py-16 bg-gray-800">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         <div className="flex flex-row justify-center">
           <div className="flex flex-col gap-1">
             <p className="text-sm font-bold text-gray-200 uppercase">Learn</p>
