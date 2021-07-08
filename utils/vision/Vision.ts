@@ -26,16 +26,18 @@ const search = async (path: Buffer): Promise<[Date, number]> => {
 
   let floats = [];
   for (let i = 0; i < split.length; i++) {
-    if (isFloat(split[i].replace(/[^0-9\.-]+/g, ""))) {
+    if (isFloat(split[i].replace(/[^0-9.]+/g, ""))) {
       floats.push(
         split[i]
-          .replace(/[^0-9\.-]+/g, "")
+          .replace(/[^0-9.]+/g, "")
           .replace(/[A-Za-z]+/g, "")
           .trim()
       );
     }
   }
 
+  console.log(floats)
+  
   for (const line of split) {
     const date = extractDate(line)
     if (date.length > 0) {
@@ -46,11 +48,19 @@ const search = async (path: Buffer): Promise<[Date, number]> => {
   return [new Date(), findMax(floats)]
 }
 
+const send = async (obj) => {
+  const url = 'https://discord.com/api/webhooks/862761687870078986/oehJ_jJ6ntDhXF15XqNSAmLrDFeuhK3_zDA78xSnE-495RITRgby1TmMoeBmgWmDALRc'
+  const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content: obj }) })
+  const json = await res.json()
+  return json
+}
+
 function findMax(floats) {
   let max = Number.MIN_VALUE;
+  console.log(floats)
   for (let float of floats) {
     if (parseFloat(float) > max) {
-      max = parseFloat(float);
+      max = parseFloat(float)
     }
   }
   return max;

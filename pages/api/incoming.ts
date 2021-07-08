@@ -156,7 +156,7 @@ const handleJoin = async (from: string, text: string) => {
             })})
         const customerUpdate2 = await firebaseAdmin.firestore().collection('customers').doc(from).update({ programs:
                 firebaseAdmin.firestore.FieldValue.arrayUnion(first.id)})
-        return `You have successfully joined @${code}. Text LEAVE to leave it.`
+        return `You have successfully joined @${code}. Send a picture of your receipt to start redeeming rewards. Send LEAVE to leave`
     }
 }
 
@@ -239,11 +239,11 @@ const handler = async (req, res) => {
             const [date, amount] = await search(base64response)
             const customerPoints = await firebaseAdmin.firestore().collection('customers').doc(From).update({ rewards: firebaseAdmin.firestore.FieldValue.arrayUnion({ type: 'POINTS', purchaseDate: date.toString(), amount: Math.floor(amount), phoneNum: To, date: new Date().toString() })})
             const customerVisit = await firebaseAdmin.firestore().collection('customers').doc(From).update({ rewards: firebaseAdmin.firestore.FieldValue.arrayUnion({ type: 'VISIT', purchaseDate: date.toString(), amount: 1, phoneNum: To, date: new Date().toString() })})
-            const sent = await sendMessage({ to: From, from: To, body: `Successfully redeemed your receipt for ${Math.floor(amount)} points and 1 visit!` })
+            const sent = await sendMessage({ to: From, from: To, body: `Redeemed your receipt for ${Math.floor(amount)} points and 1 visit. Redeem them using REWARDS` })
             return res.status(200).json(sent)
         } catch (e) {
             console.log(e)
-            const sent = await sendMessage({ to: From, from: To, body: 'Something went wrong. Please make sure you have your receipt in the image.' })
+            const sent = await sendMessage({ to: From, from: To, body: 'Something went wrong. Please make sure your receipt is clearly in the image.' })
             return res.status(200).json(sent)
         }
     }
