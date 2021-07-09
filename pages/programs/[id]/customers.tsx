@@ -19,7 +19,9 @@ const Customers = (props) => {
     useEffect(() => {
         firebase.firestore().collection('customers').where('programs', 'array-contains', program.id).get().then((query) => {
             for (const doc of query.docs) {
-                setUsersArr(usersArr.concat(doc.data()))
+                if (!usersArr.includes(doc.data())) {
+                    setUsersArr(usersArr.concat(doc.data()))
+                }
             }
         })
     }, [])
@@ -55,9 +57,8 @@ const Customers = (props) => {
                     <p>{""}</p>
                 </div>
                 { usersArr.map(user => {
-                    console.log(user)
                     return (
-                        <div key={user.phoneNum} className="grid items-center grid-cols-5">
+                        <div key="user.phoneNum" className="grid items-center grid-cols-5">
                             <p className="text-sm text-center">{ user.phoneNum }</p>
                             <p className="text-sm text-center">{ getLastTextMessage(user)[1] }</p>
                             <p className="text-sm text-center">{ getLastTextMessage(user)[0] }</p>

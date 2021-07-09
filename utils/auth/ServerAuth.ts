@@ -99,80 +99,88 @@ const getSSRPropsProgram = async (ctx) => {
 const getSSRPropsRedeem = async (ctx) => {
   const { id } = ctx.query
 
-  const db = firebaseAdmin.firestore().collection('spendLinks')
-  const snapshot = await db.doc(id).get()
+  try {
+    const db = firebaseAdmin.firestore().collection('spendLinks')
+    const snapshot = await db.doc(id).get()
 
-  if (!snapshot.exists) {
-    return {
-      props: {
-        expired: false,
-        error: true
+    if (!snapshot.exists) {
+      return {
+        redirect: {
+          permanent: false,
+          destination: '/404'
+        },
       }
     }
-  }
 
-  const customer = await firebaseAdmin.firestore().collection('customers').doc(snapshot.data().redirect.customer).get()
-  const program = await firebaseAdmin.firestore().collection('programs').doc(snapshot.data().redirect.program).get()
+    const customer = await firebaseAdmin.firestore().collection('customers').doc(snapshot.data().redirect.customer).get()
+    const program = await firebaseAdmin.firestore().collection('programs').doc(snapshot.data().redirect.program).get()
 
-  if (!customer.exists || !program.exists) {
-    return {
-      props: {
-        expired: false,
-        error: true,
-        rewards: []
+    if (!customer.exists || !program.exists) {
+      return {
+        redirect: {
+          permanent: false,
+          destination: '/404'
+        },
       }
     }
-  }
 
-  if (new Date().getTime() > new Date(snapshot.data().expire).getTime()) {
-    return {
-      props: {
-        expired: true,
-        error: true,
-        rewards: []
+    if (new Date().getTime() > new Date(snapshot.data().expire).getTime()) {
+      return {
+        redirect: {
+          permanent: false,
+          destination: '/404'
+        },
       }
     }
-  }
 
-  var totalPoints = 0, totalVisits = 0
-  customer.data().rewards.forEach(reward => {
-    if (reward.phoneNum == program.data().phoneNum) {
-      switch (reward.type) {
+    var totalPoints = 0, totalVisits = 0
+    customer.data().rewards.forEach(reward => {
+      if (reward.phoneNum == program.data().phoneNum) {
+        switch (reward.type) {
+          case "POINTS":
+            totalPoints += reward.amount
+            break
+          case "VISIT":
+            totalVisits++
+            break
+        }
+      }
+    })
+
+    var availableRewards = new Array(0)
+    for (const reward of program.data().rewards) {
+      switch (reward.attributes.type) {
         case "POINTS":
-          totalPoints += reward.amount
+          if (reward.attributes.required <= totalPoints) {
+            availableRewards.push({ reward: reward, program: program.data().id })
+          }
           break
         case "VISIT":
-          totalVisits++
+          if (reward.attributes.required <= totalVisits) {
+            availableRewards.push({ reward: reward, program: program.data().id })
+          }
           break
       }
     }
-  })
 
-  var availableRewards = new Array(0)
-  for (const reward of program.data().rewards) {
-    switch (reward.attributes.type) {
-      case "POINTS":
-        if (reward.attributes.required <= totalPoints) {
-          availableRewards.push({ reward: reward, program: program.data().id })
-        }
-        break
-      case "VISIT":
-        if (reward.attributes.required <= totalVisits) {
-          availableRewards.push({ reward: reward, program: program.data().id })
-        }
-        break 
+    return {
+      props: {
+        expired: false,
+        error: false,
+        rewards: availableRewards,
+        points: totalPoints,
+        visits: totalVisits,
+        customer: customer.data(),
+        program: { name: program.data().name }
+      }
     }
-  }
-
-  return {
-    props: {
-      expired: false,
-      error: false,
-      rewards: availableRewards,
-      points: totalPoints,
-      visits: totalVisits,
-      customer: customer.data(),
-      program: { name: program.data().name }
+  } catch (e) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: '/404'
+      },
+      props: {} as never
     }
   }
 

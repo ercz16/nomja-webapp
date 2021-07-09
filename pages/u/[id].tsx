@@ -9,7 +9,6 @@ export const getServerSideProps = async (ctx) => {
 
 const RewardRedeem = (props) => {
     const { rewards, error, expired, program, customer, visits, points } = props
-    console.log(props)
     return (
         <>
         <Head>
@@ -86,7 +85,7 @@ const Rewards = (props) => {
                                                 ? `After ${reward.reward.attributes.required} points` : `After ${reward.reward.attributes.required} visits`}</p>
                                         </div>
                                         <div className="flex flex-col mt-auto">
-                                            <button className="text-white bg-red-500 rounded-b focus:outline-none hover:bg-red-600">Redeem</button>
+                                            <button className="text-white bg-indigo-500 rounded-b focus:outline-none hover:bg-indigo-600">Redeem</button>
                                         </div>
                                     </div>
                                 </>
