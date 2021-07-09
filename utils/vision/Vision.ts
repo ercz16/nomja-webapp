@@ -1,4 +1,5 @@
 import { ImageAnnotatorClient } from "@google-cloud/vision"
+import { nanoid } from 'nanoid'
 import extractDate from 'extract-date'
 
 const credentials = {
@@ -20,6 +21,7 @@ const date = /^(?:(?:31(\/|-|\.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/|-|\.)(?:0
 const email = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 
 interface IScanOutput {
+  id: string,
   transaction: {
     tender: string,
     change: number,
@@ -31,7 +33,8 @@ interface IScanOutput {
   websites: Array<string>,
   date: string,
   time: number,
-  fullDate: number
+  fullDate: number,
+  program: string // phone number of program
 }
 
 const formatPhoneNumber = (phoneNumberString) => {
@@ -62,7 +65,7 @@ const getAllSubstrings = (s) => {
 
 const scanOutput = (input: string): IScanOutput => {
   const result = {
-    transaction: { tender: 'CARD', change: 0, paid: -5e24, total: -5e24 }, phones: [], emails: [], websites: [], date: null, time: null, fullDate: null
+    id: nanoid(32), program: null, transaction: { tender: 'CARD', change: 0, paid: -5e24, total: -5e24 }, phones: [], emails: [], websites: [], date: null, time: null, fullDate: null
   }
 
   const split = input.split(' ').map(str => str.trim())

@@ -234,28 +234,34 @@ const handler = async (req, res) => {
             base64.data,
             "binary"
         )
-        
+
         try {
             const scanOutput: IScanOutput = await search(base64response)
             console.log(scanOutput)
 
             const doc = await firebaseAdmin.firestore().collection('customers').doc(From).get()
+            const programsQuery = await firebaseAdmin.firestore().collection('programs').where('phoneNum', '==', To).get()
+            if (programsQuery.docs.length < 1) throw new Error('Invalid program phone number')
+
+            scanOutput.program = To
 
             if (doc.data().receipts) {
                 for (const receipt of doc.data().receipts) {
                     const receiptData = {
                         transaction: receipt.transaction,
-                        fullDate: new Date(receipt.fullDate).getTime()
+                        fullDate: new Date(receipt.fullDate).getTime(),
+                        program: receipt.program
                     }
 
                     if (receiptData.transaction.tender == scanOutput.transaction.tender && receiptData.transaction.total == scanOutput.transaction.total
                         && receiptData.transaction.change == scanOutput.transaction.change && receiptData.transaction.paid == scanOutput.transaction.paid
-                        && (!receiptData ? false : receiptData.fullDate == scanOutput.fullDate)) {
+                        && (!receiptData.program ? false : receiptData.program == scanOutput.program) && (!receiptData.fullDate ? false : receiptData.fullDate == scanOutput.fullDate)) {
                         const sent = await sendMessage({ to: From, from: To, body: "We're sorry, but you are not able to redeem a receipt twice. If you feel this is an error, please let us know." })
                         return res.status(200).json(sent)
                     }
                 }
             }
+
 
             const updatePoints = await firebaseAdmin.firestore().collection('customers').doc(From)
                 .update({ rewards: firebaseAdmin.firestore.FieldValue.arrayUnion({ type: 'POINTS', purchaseDate: new Date(scanOutput.fullDate).toISOString() ? new Date(scanOutput.fullDate).toISOString() : "",
@@ -263,6 +269,7 @@ const handler = async (req, res) => {
             const updateVisits = await firebaseAdmin.firestore().collection('customers').doc(From)
                 .update({ rewards: firebaseAdmin.firestore.FieldValue.arrayUnion({ type: 'VISIT', purchaseDate: new Date(scanOutput.fullDate).toISOString() ? new Date(scanOutput.fullDate).toISOString() : "",
                         amount: 1, phoneNum: To, date: new Date().toString() })})
+
             const updateReceipts = await firebaseAdmin.firestore().collection('customers').doc(From)
                 .update({ receipts: firebaseAdmin.firestore.FieldValue.arrayUnion(scanOutput) })
 
@@ -288,7 +295,8 @@ interface IScanOutput {
     websites: Array<string>,
     date: string,
     time: number,
-    fullDate: number
+    fullDate: number,
+    program: string // phone number of program
 }
 
 export default withSentry(handler)
