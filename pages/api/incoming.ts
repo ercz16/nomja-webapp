@@ -237,6 +237,7 @@ const handler = async (req, res) => {
         
         try {
             const scanOutput: IScanOutput = await search(base64response)
+            console.log(scanOutput)
 
             const doc = await firebaseAdmin.firestore().collection('customers').doc(From).get()
 
@@ -249,7 +250,7 @@ const handler = async (req, res) => {
 
                     if (receiptData.transaction.tender == scanOutput.transaction.tender && receiptData.transaction.total == scanOutput.transaction.total
                         && receiptData.transaction.change == scanOutput.transaction.change && receiptData.transaction.paid == scanOutput.transaction.paid
-                        && receiptData.fullDate == scanOutput.fullDate) {
+                        && (!receiptData ? true : receiptData.fullDate == scanOutput.fullDate)) {
                         const sent = await sendMessage({ to: From, from: To, body: "We're sorry, but you are not able to redeem a receipt twice. If you feel this is an error, please let us know." })
                         return res.status(200).json(sent)
                     }
