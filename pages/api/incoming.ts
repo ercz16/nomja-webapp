@@ -156,7 +156,7 @@ const handleJoin = async (from: string, text: string) => {
             })})
         const customerUpdate2 = await firebaseAdmin.firestore().collection('customers').doc(from).update({ programs:
                 firebaseAdmin.firestore.FieldValue.arrayUnion(first.id)})
-        return `You have successfully joined @${code}. Send a picture of your receipt to start redeeming rewards. Send LEAVE to leave`
+        return `You have successfully joined @${code}. Send a picture of your receipt to begin. Send LEAVE to leave.`
     }
 }
 
