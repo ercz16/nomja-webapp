@@ -236,10 +236,36 @@ const handler = async (req, res) => {
         )
         
         try {
-            const [date, amount] = await search(base64response)
-            const customerPoints = await firebaseAdmin.firestore().collection('customers').doc(From).update({ rewards: firebaseAdmin.firestore.FieldValue.arrayUnion({ type: 'POINTS', purchaseDate: date.toString(), amount: Math.floor(amount), phoneNum: To, date: new Date().toString() })})
-            const customerVisit = await firebaseAdmin.firestore().collection('customers').doc(From).update({ rewards: firebaseAdmin.firestore.FieldValue.arrayUnion({ type: 'VISIT', purchaseDate: date.toString(), amount: 1, phoneNum: To, date: new Date().toString() })})
-            const sent = await sendMessage({ to: From, from: To, body: `Redeemed your receipt for ${Math.floor(amount)} points and 1 visit. Redeem them using REWARDS` })
+            const scanOutput: IScanOutput = await search(base64response)
+
+            const doc = await firebaseAdmin.firestore().collection('customers').doc(From).get()
+
+            if (doc.data().receipts) {
+                for (const receipt of doc.data().receipts) {
+                    const receiptData = {
+                        transaction: receipt.transaction,
+                        fullDate: new Date(receipt.fullDate).getTime()
+                    }
+
+                    if (receiptData.transaction.tender == scanOutput.transaction.tender && receiptData.transaction.total == scanOutput.transaction.total
+                        && receiptData.transaction.change == scanOutput.transaction.change && receiptData.transaction.paid == scanOutput.transaction.paid
+                        && receiptData.fullDate == scanOutput.fullDate) {
+                        const sent = await sendMessage({ to: From, from: To, body: "We're sorry, but you are not able to redeem a receipt twice. If you feel this is an error, please let us know." })
+                        return res.status(200).json(sent)
+                    }
+                }
+            }
+
+            const updatePoints = await firebaseAdmin.firestore().collection('customers').doc(From)
+                .update({ rewards: firebaseAdmin.firestore.FieldValue.arrayUnion({ type: 'POINTS', purchaseDate: new Date(scanOutput.fullDate).toISOString() ? new Date(scanOutput.fullDate).toISOString() : "",
+                        phoneNum: To, date: new Date().toString(), amount: Math.floor(scanOutput.transaction.total), metadata: scanOutput }) })
+            const updateVisits = await firebaseAdmin.firestore().collection('customers').doc(From)
+                .update({ rewards: firebaseAdmin.firestore.FieldValue.arrayUnion({ type: 'VISIT', purchaseDate: new Date(scanOutput.fullDate).toISOString() ? new Date(scanOutput.fullDate).toISOString() : "",
+                        amount: 1, phoneNum: To, date: new Date().toString() })})
+            const updateReceipts = await firebaseAdmin.firestore().collection('customers').doc(From)
+                .update({ receipts: firebaseAdmin.firestore.FieldValue.arrayUnion(scanOutput) })
+
+            const sent = await sendMessage({ to: From, from: To, body: `Successfully redeemed your receipt for ${Math.floor(scanOutput.transaction.total)} points and 1 visit. Spend your rewards by sending REWARDS` })
             return res.status(200).json(sent)
         } catch (e) {
             console.log(e)
@@ -247,6 +273,21 @@ const handler = async (req, res) => {
             return res.status(200).json(sent)
         }
     }
+}
+
+interface IScanOutput {
+    transaction: {
+        tender: string,
+        change: number,
+        paid: number,
+        total: number,
+    },
+    phones: Array<string>,
+    emails: Array<string>,
+    websites: Array<string>,
+    date: string,
+    time: number,
+    fullDate: number
 }
 
 export default withSentry(handler)

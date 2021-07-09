@@ -13,57 +13,147 @@ const visionClient = new ImageAnnotatorClient({
   credentials: credentials,
 });
 
-function isFloat(n) {
-  if (n.match(/^-?\d*(\.\d+)?$/) && !isNaN(parseFloat(n)) && n % 1 != 0)
-    return true;
-  return false;
+const web = /(https?:\/\/)?(www\.)?[a-z0-9]+\.(com|org)(\.[a-z]{2,3})?/
+const phone = /^[+]?(\d{1,2})?[\s.-]?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]\d{4}$/
+const time =  /(?:\d|2[0-3])?:?(?:[0-5]\d):(?:[0-5]\d)/
+const date = /^(?:(?:31(\/|-|\.)(?:0?[13578]|1[02]))\1|(?:(?:29|30)(\/|-|\.)(?:0?[13-9]|1[0-2])\2))(?:(?:1[6-9]|[2-9]\d)?\d{2})$|^(?:29(\/|-|\.)0?2\3(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))$|^(?:0?[1-9]|1\d|2[0-8])(\/|-|\.)(?:(?:0?[1-9])|(?:1[0-2]))\4(?:(?:1[6-9]|[2-9]\d)?\d{2})$/
+const email = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+
+interface IScanOutput {
+  transaction: {
+    tender: string,
+    change: number,
+    paid: number,
+    total: number,
+  },
+  phones: Array<string>,
+  emails: Array<string>,
+  websites: Array<string>,
+  date: string,
+  time: number,
+  fullDate: number
 }
 
-const search = async (path: Buffer): Promise<[Date, number]> => {
+const formatPhoneNumber = (phoneNumberString) => {
+  var cleaned = ('' + phoneNumberString).replace(/\D/g, '');
+  var match = cleaned.match(/^(1|)?(\d{3})(\d{3})(\d{4})$/);
+  if (match) {
+    var intlCode = (match[1] ? '+1 ' : '');
+    return [intlCode, '(', match[2], ') ', match[3], '-', match[4]].join('');
+  }
+  return null;
+}
+
+const isFloat = (n) => {
+  return Math.ceil(parseFloat(n)) !== n
+}
+
+const getAllSubstrings = (s) => {
+  var i, j, result = []
+  const size = 0
+  for (i = 0; i < s.length; i++) {
+    for (j = s.length; j - i >= size; j--) {
+      result.push(s.slice(i, j))
+    }
+  }
+  return result
+}
+
+
+const scanOutput = (input: string): IScanOutput => {
+  const result = {
+    transaction: { tender: 'CARD', change: 0, paid: -5e24, total: -5e24 }, phones: [], emails: [], websites: [], date: null, time: null, fullDate: null
+  }
+
+  const split = input.split(' ').map(str => str.trim())
+
+  const totals = []
+  var paidCash = false
+
+  for (const s of split) {
+    const substrings = getAllSubstrings(s)
+
+    if ((s.toLowerCase().includes('cash') && !s.toLowerCase().includes('cashier')) || s.toLowerCase().includes('change')) {
+        paidCash = true
+        result.transaction.tender = 'CASH'
+    }
+
+    const reduced = s.includes('$') ? s.substr(1) : s
+    //const numeric = reduced.replace(/[^0-9\.]/g, '')
+    if (reduced.includes('.') && /[0-9]/.test(reduced) && !/[^[0-9\.]/.test(reduced) && isFloat(reduced)) {
+      if (parseFloat(reduced) > result.transaction.total) {
+        result.transaction.paid = parseFloat(reduced)
+        result.transaction.total = parseFloat(reduced)
+      }
+      totals.push(parseFloat(reduced))
+    }
+
+    for (const sub of substrings) {
+      if (time.test(sub)) {
+        result.time = sub
+        break
+      } else if (date.test(sub)) {
+        result.date = sub
+        break
+      } else if (phone.test(sub)) {
+        if (!result.phones.includes(sub)) {
+          result.phones.push(sub)
+        }
+        break
+      } else if (email.test(sub.toLowerCase())) {
+        if (!result.emails.includes(sub.toLowerCase())) {
+          result.emails.push(sub.toLowerCase())
+        }
+        break
+      } else if (web.test(sub.toLowerCase()) && !sub.includes('@')) {
+        if (!result.websites.includes(sub.toLowerCase())) {
+          result.websites.push(sub.toLowerCase())
+        }
+        break
+      }
+    }
+
+  }
+
+  const sortedTotals = totals.sort((a, b) => { return a - b })
+  if (sortedTotals.length >= 3) {
+      const top3 = sortedTotals.slice(sortedTotals.length - 3)
+
+      const paid = top3[2]
+      const change = top3[1]
+      const total = top3[0]
+
+      if (change == 0 && change == total) {
+        result.transaction.change = 0
+        result.transaction.paid = 0
+        result.transaction.total = 0
+        result.transaction.tender = 'FREE'
+      }
+
+      if (paid - change == total) {
+        result.transaction.change = change
+        result.transaction.paid = paid
+        result.transaction.total = total
+      }
+  }
+
+  result.phones = result.phones.map(phone => formatPhoneNumber(phone.replace(/[^0-9]/g, '')))
+
+  if (result.date) {
+    result.fullDate = new Date(`${result.date} ${result.time ? result.time : ''}`).getTime()
+  }
+
+  return result
+}
+
+const search = async (path: Buffer): Promise<IScanOutput> => {
   const [result] = await visionClient.textDetection(path)
   const detections = result.textAnnotations
-  const split = detections.map((desc) => desc.description)[0].split("\n")
+  const splitToString = detections.map((desc) => desc.description)[0].split('\n').join(' ')
 
-  let floats = [];
-  for (let i = 0; i < split.length; i++) {
-    if (isFloat(split[i].replace(/[^0-9.]+/g, ""))) {
-      floats.push(
-        split[i]
-          .replace(/[^0-9.]+/g, "")
-          .replace(/[A-Za-z]+/g, "")
-          .trim()
-      );
-    }
-  }
+  const output: IScanOutput = scanOutput(splitToString)
 
-  console.log(floats)
-  
-  for (const line of split) {
-    const date = extractDate(line)
-    if (date.length > 0) {
-      return [new Date(date[0].date), findMax(floats)]
-    }
-  }
-
-  return [new Date(), findMax(floats)]
-}
-
-const send = async (obj) => {
-  const url = 'https://discord.com/api/webhooks/862761687870078986/oehJ_jJ6ntDhXF15XqNSAmLrDFeuhK3_zDA78xSnE-495RITRgby1TmMoeBmgWmDALRc'
-  const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content: obj }) })
-  const json = await res.json()
-  return json
-}
-
-function findMax(floats) {
-  let max = Number.MIN_VALUE;
-  console.log(floats)
-  for (let float of floats) {
-    if (parseFloat(float) > max) {
-      max = parseFloat(float)
-    }
-  }
-  return max;
+  return output
 }
 
 export { search }
