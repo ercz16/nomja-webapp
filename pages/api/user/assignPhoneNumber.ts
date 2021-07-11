@@ -1,4 +1,4 @@
-import { withSentry } from '@sentry/nextjs'
+//import { withSentry } from '@sentry/nextjs'
 import { client } from '../../../utils/plivo/Plivo'
 import { firebaseAdmin } from '../../../utils/firebase/FirebaseAdmin'
 
@@ -31,4 +31,4 @@ const handler = async (req, res) => {
     return res.status(200).json({})
 }
 
-export default withSentry(handler)
+export default handler
