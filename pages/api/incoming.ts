@@ -3,7 +3,7 @@ import { search } from '../../utils/vision/Vision'
 import { nanoid } from 'nanoid'
 import axios from 'axios'
 import { sendMessage } from '../../utils/plivo/Plivo'
-import { withSentry } from '@sentry/nextjs'
+//import { withSentry } from '@sentry/nextjs'
 
 enum TextType {
     COMMAND = "COMMAND",
@@ -306,4 +306,5 @@ interface IScanOutput {
     program?: string // phone number of program
 }
 
-export default withSentry(handler)
+export default handler
+//export default withSentry(handler)
