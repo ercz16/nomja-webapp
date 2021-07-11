@@ -24,7 +24,7 @@ const Navbar = (props) => {
 
   return (
       <>
-      <div className={`${scrolled ? 'bg-white border-b shadow transition ease-in-out duration-500 transform translate-y-1 -mt-1' : ''} fixed flex justify-between w-full items-center z-20 px-8 sm:px-16 md:px-32 xl:px-64 py-4`}>
+      <div className={`${scrolled ? 'bg-white shadow transition ease-in-out duration-500 transform translate-y-1 -mt-1' : ''} fixed flex justify-between w-full items-center z-20 px-8 sm:px-16 md:px-32 xl:px-64 py-4`}>
         <Link href='/'>
           <a className="text-indigo-500 hover:text-indigo-600 text-5xl font-bold leading-1 flex">
             <img width="196" src="/assets/all-together.png" />
@@ -132,18 +132,40 @@ const Navbar = (props) => {
 }
 
 const LandingSection = () => {
+  const [scrolled, setScrolled] = useState(false)
+  const [phoneScrolled, setPhoneScrolled] = useState(false)
+
+  useEffect(() => {
+    window.addEventListener('scroll', (e) => {
+      const offsetY = window.pageYOffset
+      if (offsetY > 15) {
+        setScrolled(true)
+      } else {
+        setScrolled(false)
+      }
+
+      try {
+        if (offsetY > 500 && offsetY <= lastDivRef.current.offsetHeight + 175) {
+          setPhoneScrolled(true)
+        } else {
+          setPhoneScrolled(false)
+        }
+      } catch (e) {
+        setPhoneScrolled(false)
+      }
+
+    })
+  }, [])
+
   const [showing, setShowing] = useState(true)
+  const lastDivRef = useRef(null)
+
   return (
     <>
-      <div className="hidden absolute z-0 -mt-20 top-0 right-0 w-1/2">
-        <svg style={{ width: '64rem' }} className="text-indigo-800 fill-current" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-          <path d="M44.8,-56.4C54.3,-45.4,55.7,-27.7,55.9,-12C56,3.6,54.9,17.3,49.1,29.5C43.4,41.6,33.1,52.2,18.7,62.2C4.2,72.1,-14.4,81.5,-25.7,75.3C-37,69.2,-40.9,47.5,-47.3,30.3C-53.8,13,-62.8,0.2,-61.1,-10.9C-59.3,-22.1,-46.8,-31.5,-34.8,-42.1C-22.8,-52.7,-11.4,-64.5,3.1,-68.2C17.6,-71.9,35.2,-67.4,44.8,-56.4Z" transform="translate(100 100)" />
-        </svg>
-      </div>
       <div className="relative grid items-center grid-cols-1 lg:grid-cols-2 gap-12 px-8 sm:px-16 md:px-32 xl:px-64 py-32 shadow-b-lg">
         <div className="flex flex-col gap-5">
-          <p className="text-6xl font-bold text-gray-800">The modern way to gain <span className="inline text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-bl from-indigo-500 to-indigo-800">retention</span></p>
-          <p className="text-2xl font-light text-gray-700">Get the most out of your customers and encourage them to come back using a modernized loyalty program all through text messaging.</p>
+          <p className="text-6xl font-bold text-gray-800">The modern way to grow <span className="inline text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-bl from-indigo-500 to-indigo-800">retention</span></p>
+          <p className="text-2xl font-light text-gray-700">Drive customer retention through promotions and rewards powered by text messaging.</p>
           <div className="flex flex-row gap-3 items-center">
             <Link href="/auth/signup">
               <a className="px-4 py-2 text-xl font-medium text-white bg-indigo-500 hover:bg-indigo-600 rounded shadow">Get Started</a>
@@ -153,19 +175,44 @@ const LandingSection = () => {
             </Link>
           </div>
         </div>
-        <Transition
-            show={showing}
-            enter="transition-opacity duration-300"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="transition-opacity duration-300"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-        >
-          <div className="flex flex-col items-center justify-center">
-            <img className="w-1/2" src="/assets/iphone_demo.png" />
+        <div className={`${phoneScrolled ? 'lg:invisible flex flex-col items-center justify-center' : 'flex flex-col items-center justify-center'}`}>
+          <img className="w-7/12" src="/assets/iphone_demo.png" />
+        </div>
+        <div ref={lastDivRef} className="flex flex-col gap-24 py-24">
+          <div className="flex items-center md:items-start text-center md:text-left col-start-1 gap-3 flex-col">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-14 p-1 fill-current text-indigo-600 border-4 border-indigo-400 rounded-full w-14" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z" />
+              <path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z" />
+            </svg>
+            <p className="font-semibold text-4xl text-gray-800">Text Message Based</p>
+            <p className="text-xl text-gray-600">Nearly <span className="bg-gradient-to-r font-bold bg-indigo-500 bg-indigo-600 text-transparent bg-clip-text">97%</span> of text messages are opened within the first <span className="bg-gradient-to-r font-bold bg-indigo-500 bg-indigo-600 text-transparent bg-clip-text">15 minutes</span> of being sent. Text messaging is an instantaneous solution for modern customer outreach.</p>
           </div>
-        </Transition>
+          <div className="flex items-center md:items-start text-center md:text-left col-start-1 gap-3 flex-col">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-14 p-1 fill-current text-indigo-600 border-4 border-indigo-400 rounded-full w-14" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M11 6a3 3 0 11-6 0 3 3 0 016 0zM14 17a6 6 0 00-12 0h12zM13 8a1 1 0 100 2h4a1 1 0 100-2h-4z" />
+            </svg>
+            <p className="font-semibold text-4xl text-gray-800">Accountless</p>
+            <p className="text-xl text-gray-600">No extra hassle on your customers to join your text message marketing. A customer's account is tied to their phone number, making the sign up process easy. To opt-in, a customer only sends <span className="bg-gradient-to-r font-bold bg-indigo-500 bg-indigo-600 text-transparent bg-clip-text">1 text message</span>.</p>
+          </div>
+          <div className="flex items-center md:items-start text-center md:text-left col-start-1 gap-3 flex-col">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-14 p-1 fill-current text-indigo-600 border-4 border-indigo-400 rounded-full w-14" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+            </svg>
+            <p className="font-semibold text-4xl text-gray-800">Fast Setup</p>
+            <p className="text-xl text-gray-600">Sign up and deploy a standalone promotional program for your business <span className="bg-gradient-to-r font-bold bg-indigo-500 bg-indigo-600 text-transparent bg-clip-text">within minutes</span>. Begin creating rewards to incentivise your customers to come back.</p>
+          </div>
+          <div className="flex items-center md:items-start text-center md:text-left col-start-1 gap-3 flex-col">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-14 p-1 fill-current text-indigo-600 border-4 border-indigo-400 rounded-full w-14" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M13 7H7v6h6V7z" />
+              <path fillRule="evenodd" d="M7 2a1 1 0 012 0v1h2V2a1 1 0 112 0v1h2a2 2 0 012 2v2h1a1 1 0 110 2h-1v2h1a1 1 0 110 2h-1v2a2 2 0 01-2 2h-2v1a1 1 0 11-2 0v-1H9v1a1 1 0 11-2 0v-1H5a2 2 0 01-2-2v-2H2a1 1 0 110-2h1V9H2a1 1 0 010-2h1V5a2 2 0 012-2h2V2zM5 5h10v10H5V5z" clipRule="evenodd" />
+            </svg>
+            <p className="font-semibold text-4xl text-gray-800">No Integration</p>
+            <p className="text-xl text-gray-600">No need to implement your program with your other business systems. You are able to send promotions to <span className="bg-gradient-to-r font-bold bg-indigo-500 bg-indigo-600 text-transparent bg-clip-text">whoever</span> you want <span className="bg-gradient-to-r font-bold bg-indigo-500 bg-indigo-600 text-transparent bg-clip-text">whenever</span> you want.</p>
+          </div>
+        </div>
+        <div className={`${phoneScrolled ? 'invisible lg:visible fixed xl:mr-36 right-0 w-4/12' : 'invisible'}`}>
+          <img className="w-7/12" src="/assets/iphone_demo.png" />
+        </div>
       </div>
     </>
   )
