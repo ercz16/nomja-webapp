@@ -27,14 +27,18 @@ interface IScanOutput {
     change: number,
     paid: number,
     total: number,
+    tax: number
   },
   phones: Array<string>,
   emails: Array<string>,
   websites: Array<string>,
-  date: string,
-  time: number,
-  fullDate: number,
-  program: string // phone number of program
+  date: {
+    actual: string,
+    time: string,
+    period: string,
+    timestamp: number
+  },
+  program?: string // phone number of program
 }
 
 const formatPhoneNumber = (phoneNumberString) => {
@@ -65,7 +69,7 @@ const getAllSubstrings = (s) => {
 
 const scanOutput = (input: string): IScanOutput => {
   const result = {
-    id: nanoid(32), program: null, transaction: { tender: 'CARD', change: 0, paid: -5e24, total: -5e24 }, phones: [], emails: [], websites: [], date: null, time: null, fullDate: null
+    id: nanoid(64).replace(/[^A-Za-z0-9]/g, ''), transaction: { tender: 'CARD', change: 0, paid: -5e24, total: -5e24, tax: 0 }, phones: [], emails: [], websites: [], date: { actual: null, time: null, period: 'am', timestamp: null }
   }
 
   const split = input.split(' ').map(str => str.trim())
@@ -76,27 +80,38 @@ const scanOutput = (input: string): IScanOutput => {
   for (const s of split) {
     const substrings = getAllSubstrings(s)
 
+    if (s.toLowerCase() == 'pm') {
+      result.date.period = 'pm'
+    }
+
     if ((s.toLowerCase().includes('cash') && !s.toLowerCase().includes('cashier')) || s.toLowerCase().includes('change')) {
-        paidCash = true
-        result.transaction.tender = 'CASH'
+      paidCash = true
+      result.transaction.tender = 'CASH'
+    }
+
+    // Handle in case CHANGE is 0.00 for card payments
+    if (s.toLowerCase().includes('debit') || s.toLowerCase().includes('credit')) {
+      paidCash = false
+      result.transaction.tender = 'CARD'
     }
 
     const reduced = s.includes('$') ? s.substr(1) : s
-    //const numeric = reduced.replace(/[^0-9\.]/g, '')
     if (reduced.includes('.') && /[0-9]/.test(reduced) && !/[^[0-9\.]/.test(reduced) && isFloat(reduced)) {
       if (parseFloat(reduced) > result.transaction.total) {
         result.transaction.paid = parseFloat(reduced)
         result.transaction.total = parseFloat(reduced)
       }
-      totals.push(parseFloat(reduced))
+      if (s.indexOf('.') != -1 && s.substr(s.indexOf('.') + 1).length == 2) {
+        totals.push(parseFloat(reduced))
+      }
     }
 
     for (const sub of substrings) {
       if (time.test(sub)) {
-        result.time = sub
+        result.date.time = sub
         break
       } else if (date.test(sub)) {
-        result.date = sub
+        result.date.actual = sub
         break
       } else if (phone.test(sub)) {
         if (!result.phones.includes(sub)) {
@@ -118,7 +133,12 @@ const scanOutput = (input: string): IScanOutput => {
 
   }
 
-  const sortedTotals = totals.sort((a, b) => { return a - b })
+  var sortedTotals = totals.sort((a, b) => { return a - b })
+
+  if (sortedTotals.length >= 2 && sortedTotals[sortedTotals.length - 1] == sortedTotals[sortedTotals.length - 2]) {
+    sortedTotals = sortedTotals.slice(0, sortedTotals.length - 1)
+  }
+
   if (sortedTotals.length >= 3) {
       const top3 = sortedTotals.slice(sortedTotals.length - 3)
 
@@ -138,12 +158,25 @@ const scanOutput = (input: string): IScanOutput => {
         result.transaction.paid = paid
         result.transaction.total = total
       }
+
+      var possibleTax = -1
+
+      if (result.transaction.tender == 'CASH') {
+        const subtotal = sortedTotals.slice(sortedTotals.length - 4)[0]
+        possibleTax = parseFloat((total - subtotal).toFixed(2))
+      } else {
+        possibleTax = parseFloat((paid - change).toFixed(2))
+      }
+
+      if (result.transaction.tender != 'FREE' && possibleTax != -1 && totals.includes(possibleTax)) {
+        result.transaction.tax = possibleTax
+      }
   }
 
   result.phones = result.phones.map(phone => formatPhoneNumber(phone.replace(/[^0-9]/g, '')))
 
-  if (result.date) {
-    result.fullDate = new Date(`${result.date} ${result.time ? result.time : ''}`).getTime()
+  if (result.date.actual) {
+    result.date.timestamp = new Date(`${result.date.actual} ${result.date.time ? result.date.time + ' ' + (result.date.period ? result.date.period : '') : ''}`).getTime()
   }
 
   return result
