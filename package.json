@@ -13,7 +13,6 @@
     "@badrap/bar-of-progress": "^0.1.2",
     "@google-cloud/vision": "^2.3.4",
     "@headlessui/react": "^1.2.0",
-    "@sentry/nextjs": "^6.8.0",
     "@tailwindcss/forms": "^0.3.3",
     "axios": "^0.21.1",
     "extract-date": "^2.8.2",
