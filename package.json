@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "npm ci && next build && next start",
+    "start": "npm ci && next build && next start -p 5000",
     "lint": "next lint"
   },
   "dependencies": {
