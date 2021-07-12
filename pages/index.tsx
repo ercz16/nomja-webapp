@@ -30,7 +30,7 @@ const Navbar = (props) => {
             <img width="196" src="/assets/all-together.png" />
           </a>
         </Link>
-        <div className={`${scrolled ? 'lg:flex' : 'hidden'} hidden items-center gap-6`}>
+        <div className={`${scrolled ? /* 'lg:flex' */'hidden' : 'hidden'} items-center gap-6`}>
           <Link href='/features'>
             <a className="text-gray-700 font-medium">Features</a>
           </Link>
