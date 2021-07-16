@@ -37,7 +37,7 @@ const Navbar = (props) => {
           <Link href='/pricing'>
             <a className="text-gray-700 font-medium">Pricing</a>
           </Link>
-          <div className="relative">
+          <div className="relative"> 
             <div className="flex items-center gap-1 cursor-pointer" onClick={() => setShowCompany(!showCompany)}>
               <p className="py-3 text-gray-700 font-medium">Company</p>
               <div className="cursor-pointer text-gray-600 mr-3">

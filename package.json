@@ -2,7 +2,9 @@
   "name": "webapp",
   "version": "0.1.0",
   "private": true,
-  "cacheDirectories": [".next/cache"],
+  "cacheDirectories": [
+    ".next/cache"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -19,6 +21,7 @@
     "extract-date": "^2.8.2",
     "firebase": "^8.6.8",
     "firebase-admin": "^9.9.0",
+    "mongodb": "^4.0.0",
     "nanoid": "^3.1.23",
     "next": "^10.2.3",
     "nookies": "^2.5.2",

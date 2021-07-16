@@ -4,6 +4,7 @@ import { nanoid } from 'nanoid'
 import axios from 'axios'
 import { sendMessage } from '../../utils/plivo/Plivo'
 import { withSentry } from '@sentry/nextjs'
+import { getCollection } from '../../utils/mongo/Mongo'
 
 enum TextType {
     COMMAND = "COMMAND",
@@ -193,18 +194,23 @@ const handleText = async (text: string, to: string, from: string) => {
 }
 
 const process = async (uuid) => {
-    const doc = await firebaseAdmin.firestore().collection('queuedMessages').doc(uuid).set({ start: new Date().toISOString() })
+    const collection = await getCollection('queuedMessages')
+    const insert = await collection.insertOne({ start: new Date(), uuid: uuid })
 }
 
 const isProcessing = async (uuid) => {
-    const doc = await firebaseAdmin.firestore().collection('queuedMessages').doc(uuid).get()
-    return doc.exists
+    const collection = await getCollection('queuedMessages')
+    const doc = await collection.findOne({ uuid: uuid })
+    return doc
 }
 
 const handler = async (req, res) => {
     if (req.method != 'POST') {
-        return res.status(400).json({ errors: [{ message: 'Invalid request method' }]})
+        return res.status(400).json({ errors: [{ message: 'Invalid request method.' }]})
     }
+
+    console.time('Request')
+    console.time('Request Start')
     
     const { From, To, Text, MediaCount, MessageUUID } = req.body
 

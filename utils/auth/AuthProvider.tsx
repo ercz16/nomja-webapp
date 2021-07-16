@@ -5,7 +5,7 @@ const firestore = firebase.firestore, auth = firebase.auth
 
 const AuthContext = createContext({ user: null, data: null, programs: null })
 
-export function AuthProvider({ children }) {
+export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null)
     const [data, setData] = useState(null)
     const [programs, setPrograms] = useState(null)
