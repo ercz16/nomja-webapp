@@ -4,7 +4,6 @@ import { nanoid } from 'nanoid'
 import axios from 'axios'
 import { sendMessage } from '../../utils/plivo/Plivo'
 import { withSentry } from '@sentry/nextjs'
-import { getCollection } from '../../utils/mongo/Mongo'
 
 enum TextType {
     COMMAND = "COMMAND",
@@ -194,14 +193,14 @@ const handleText = async (text: string, to: string, from: string) => {
 }
 
 const process = async (uuid) => {
-    const collection = await getCollection('queuedMessages')
-    const insert = await collection.insertOne({ start: new Date(), uuid: uuid })
+    const collection = await firebaseAdmin.firestore().collection('queuedMessages')
+    const insert = await collection.doc(uuid).set({ start: new Date(), uuid: uuid })
 }
 
 const isProcessing = async (uuid) => {
-    const collection = await getCollection('queuedMessages')
-    const doc = await collection.findOne({ uuid: uuid })
-    return doc
+    const collection = await firebaseAdmin.firestore().collection('queuedMessages')
+    const doc = await collection.doc(uuid).get()
+    return doc.exists
 }
 
 const handler = async (req, res) => {
